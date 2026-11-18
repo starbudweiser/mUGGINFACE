@@ -29,7 +29,7 @@ struct WatchView: View {
         VStack(alignment: .leading, spacing: 12) {
             PaneTitle(text: L.t("watch.title", app.unreadCount), trailing: AnyView(Button(L.t("watch.markread")) { app.markAllRead() }.buttonStyle(.mat)))
             if app.events.isEmpty {
-                Text(L.t("watch.empty")).foregroundColor(p.text2).card().frame(maxWidth: .infinity, alignment: .leading)
+                Text(L.t("watch.empty")).foregroundColor(p.text2).frame(maxWidth: .infinity, alignment: .leading).card()
             } else {
                 ScrollView {
                     VStack(spacing: 0) {
