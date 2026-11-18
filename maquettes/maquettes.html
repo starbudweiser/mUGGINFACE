@@ -64,27 +64,27 @@ body{font:13px/1.4 -apple-system,"SF Pro Text",system-ui,sans-serif;background:#
 /* ---------- 1. Flat Round (rayon réglable) ---------- */
 [data-d=round]{--rw:calc(var(--rr)*1px + 6px);--rb:calc(var(--rr)*1px);--rc:calc(var(--rr)*.6px);--rch:calc(var(--rr)*1px);--m:#f5b800;--ok:#2fb36a;--warn:#e08a00;
  --sh:0 24px 60px rgba(0,0,0,.35);--shc:none;--bd:none}
-[data-d=round][data-th=sombre]{--bg:#17171b;--card:#232329;--ctl:#2e2e36;--t:#f4f4f6;--t2:#9a9aa6;--acc:#7c6cff;--onacc:#fff}
+[data-d=round][data-th=sombre]{--bg:#131316;--card:#232327;--ctl:#2c2c31;--t:#f5f5f7;--t2:#98989f;--acc:#0a84ff;--onacc:#fff;--ok:#30d158;--warn:#ff9f0a}
 [data-d=round][data-th=clair]{--bg:#f1f1f5;--card:#fff;--ctl:#e8e8ef;--t:#1c1c22;--t2:#6b6b78;--acc:#6a5af0;--onacc:#fff;--sh:0 24px 60px rgba(0,0,0,.18);--shc:0 1px 0 rgba(0,0,0,.04)}
 [data-d=round] .side{border:0}[data-d=round] .bar{border:0}
 [data-d=round] .mod:nth-child(1) .ico{background:#7c6cff}[data-d=round] .mod:nth-child(2) .ico{background:#ff7a59}
 [data-d=round] .mod:nth-child(3) .ico{background:#2fb36a}[data-d=round] .mod:nth-child(4) .ico{background:#19a7ce}
 [data-d=round] .mod:nth-child(5) .ico{background:#e0558a}
 /* ---------- 2. Socle standard ---------- */
-[data-d=socle]{--rw:8px;--rb:6px;--rc:4px;--rch:4px;--bg:#1e1e1e;--card:#222;--ctl:#333;--t:#ddd;--t2:#aaa;--acc:#0369a1;--onacc:#fff;--m:#f59e0b;--ok:#4ade80;--warn:#fbbf24;
- --sh:0 20px 50px rgba(0,0,0,.5);--shc:none;--bd:1px solid #333;font-size:12.5px}
+[data-d=socle]{--rw:8px;--rb:6px;--rc:4px;--rch:4px;--bg:#131316;--card:#1c1c1f;--ctl:#2c2c31;--t:#f5f5f7;--t2:#98989f;--acc:#0a84ff;--onacc:#fff;--m:#f59e0b;--ok:#30d158;--warn:#ff9f0a;
+ --sh:0 20px 50px rgba(0,0,0,.5);--shc:none;--bd:1px solid #303035;font-size:12.5px}
 [data-d=socle] .ico{background:#333;color:#38bdf8;border-radius:4px;width:34px;height:34px}
 [data-d=socle] .mod{grid-template-columns:34px 1fr 150px 90px;padding:8px 12px}
 [data-d=socle] .box{padding:10px}
 /* ---------- 3. Flat Mat ---------- */
 [data-d=mat]{--rw:12px;--rb:12px;--rc:8px;--rch:999px;--bg:#f4f1ec;--card:#fff;--ctl:#ebe6de;--t:#26231e;--t2:#7b756a;--acc:#26231e;--onacc:#f4f1ec;--m:#d9622b;--ok:#3f8f5a;--warn:#b7791f;
  --sh:0 18px 50px rgba(60,40,10,.18);--shc:none;--bd:1px solid #e3ddd2}
-[data-d=mat][data-th=sombre]{--bg:#1d1b18;--card:#272420;--ctl:#33302a;--t:#f1ede5;--t2:#9d968a;--acc:#f1ede5;--onacc:#1d1b18;--m:#f08a52;--ok:#6fcf8f;--warn:#e0b04a;--sh:0 18px 50px rgba(0,0,0,.5);--bd:1px solid #38342d}
+[data-d=mat][data-th=sombre]{--bg:#131316;--card:#232327;--ctl:#2c2c31;--t:#f5f5f7;--t2:#98989f;--acc:#0a84ff;--onacc:#fff;--m:#f08a52;--ok:#30d158;--warn:#ff9f0a;--sh:0 18px 50px rgba(0,0,0,.5);--bd:1px solid #303035}
 [data-d=mat] .ico{background:#26231e;color:#f4f1ec}
-[data-d=mat][data-th=sombre] .ico{background:#f1ede5;color:#1d1b18}
+[data-d=mat][data-th=sombre] .ico{background:#2c2c31;color:#f5f5f7}
 [data-d=mat] .mod.first{outline-color:#d9622b}
 /* ---------- 4. Verre (Apple Stephan) ---------- */
-[data-d=verre]{--rw:22px;--rb:18px;--rc:12px;--rch:999px;--bg:linear-gradient(135deg,#2a1f5c,#0e4a6b 55%,#14383a);--card:rgba(255,255,255,.10);--ctl:rgba(255,255,255,.14);--t:#fff;--t2:rgba(255,255,255,.66);--acc:#0a84ff;--onacc:#fff;--m:#ffd21e;--ok:#5fe08a;--warn:#ffc04d;
+[data-d=verre]{--rw:22px;--rb:18px;--rc:12px;--rch:999px;--bg:linear-gradient(135deg,#2a1f5c,#0e4a6b 55%,#14383a);--card:rgba(255,255,255,.10);--ctl:rgba(255,255,255,.14);--t:#f5f5f7;--t2:rgba(235,235,245,.62);--acc:#0a84ff;--onacc:#fff;--m:#ffd21e;--ok:#5fe08a;--warn:#ffc04d;
  --sh:0 30px 70px rgba(0,0,0,.5);--shc:inset 0 1px 0 rgba(255,255,255,.18);--bd:1px solid rgba(255,255,255,.14)}
 [data-d=verre] .box,[data-d=verre] .mod{backdrop-filter:blur(24px) saturate(1.4)}
 [data-d=verre] .ico{background:linear-gradient(135deg,#ffffff55,#ffffff18);border:1px solid rgba(255,255,255,.25)}

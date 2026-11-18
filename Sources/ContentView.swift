@@ -52,12 +52,13 @@ struct ContentView: View {
     var body: some View {
         VStack(spacing: 0) {
             topBar
-            Rectangle().fill(p.border).frame(height: 1)
-            HStack(spacing: 0) {
-                sidebar
-                Rectangle().fill(p.border).frame(width: 1)
+            HStack(spacing: 8) {
+                sidebar.background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(p.card))
+                    .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(p.border, lineWidth: 0.5))
                 paneView.frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-            }
+                    .background(RoundedRectangle(cornerRadius: 12, style: .continuous).fill(p.win))
+                    .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(p.border, lineWidth: 0.5))
+            }.padding(.horizontal, 8).padding(.bottom, 8)
         }
         .background(p.bg).foregroundColor(p.text)
         .frame(minWidth: 1000, minHeight: 660)
@@ -118,7 +119,7 @@ struct ContentView: View {
                 }
             }
             .font(.system(size: 13, weight: on ? .semibold : .regular)).foregroundColor(on ? p.text : p.text2)
-            .padding(.horizontal, 10).padding(.vertical, 8).background(on ? p.ctl : Color.clear).clipShape(RoundedRectangle(cornerRadius: 8))
+            .padding(.horizontal, 10).padding(.vertical, 8).background(on ? p.ctl : Color.clear).clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         }.buttonStyle(.plain)
     }
 

@@ -8,13 +8,13 @@ extension Color {
 }
 
 struct Palette {
-    var bg, card, ctl, text, text2, acc, onAcc, brand, ok, warn, danger, border: Color
-    static let light = Palette(bg: Color(hex: 0xF4F1EC), card: .white, ctl: Color(hex: 0xEBE6DE), text: Color(hex: 0x26231E), text2: Color(hex: 0x7B756A),
+    var bg, win, card, ctl, text, text2, acc, onAcc, brand, ok, warn, danger, border: Color
+    static let light = Palette(bg: Color(hex: 0xF4F1EC), win: Color(hex: 0xF4F1EC), card: .white, ctl: Color(hex: 0xEBE6DE), text: Color(hex: 0x26231E), text2: Color(hex: 0x7B756A),
                                acc: Color(hex: 0x26231E), onAcc: Color(hex: 0xF4F1EC), brand: Color(hex: 0xD9622B), ok: Color(hex: 0x3F8F5A),
                                warn: Color(hex: 0xB7791F), danger: Color(hex: 0xB93A2E), border: Color(hex: 0xE3DDD2))
-    static let dark = Palette(bg: Color(hex: 0x1D1B18), card: Color(hex: 0x272420), ctl: Color(hex: 0x33302A), text: Color(hex: 0xF1EDE5), text2: Color(hex: 0x9D968A),
-                              acc: Color(hex: 0xF1EDE5), onAcc: Color(hex: 0x1D1B18), brand: Color(hex: 0xF08A52), ok: Color(hex: 0x6FCF8F),
-                              warn: Color(hex: 0xE0B04A), danger: Color(hex: 0xF0796C), border: Color(hex: 0x38342D))
+    static let dark = Palette(bg: Color(hex: 0x131316), win: Color(hex: 0x1C1C1F), card: Color(hex: 0x232327), ctl: Color(hex: 0x2C2C31), text: Color(hex: 0xF5F5F7), text2: Color(hex: 0x98989F),
+                              acc: Color(hex: 0x0A84FF), onAcc: .white, brand: Color(hex: 0xF08A52), ok: Color(hex: 0x30D158),
+                              warn: Color(hex: 0xFF9F0A), danger: Color(hex: 0xFF453A), border: Color(hex: 0x303035))
 }
 
 private struct PaletteKey: EnvironmentKey { static let defaultValue = Palette.light }
@@ -40,8 +40,8 @@ struct MatCard: ViewModifier {
     @Environment(\.pal) var p
     var pad: CGFloat = 14
     func body(content: Content) -> some View {
-        content.padding(pad).background(p.card).clipShape(RoundedRectangle(cornerRadius: 12))
-            .overlay(RoundedRectangle(cornerRadius: 12).stroke(p.border, lineWidth: 1))
+        content.padding(pad).background(p.card).clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
+            .overlay(RoundedRectangle(cornerRadius: 12, style: .continuous).strokeBorder(p.border, lineWidth: 0.5))
     }
 }
 extension View { func card(_ pad: CGFloat = 14) -> some View { modifier(MatCard(pad: pad)) } }
@@ -54,7 +54,7 @@ struct MatButton: ButtonStyle {
             .padding(.horizontal, 12).padding(.vertical, 6)
             .foregroundColor(primary ? p.onAcc : p.text)
             .background(primary ? p.acc : p.ctl)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
+            .clipShape(RoundedRectangle(cornerRadius: 9, style: .continuous))
             .opacity(configuration.isPressed ? 0.75 : 1)
     }
 }
