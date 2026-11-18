@@ -153,6 +153,9 @@ final class AgentBridge: ObservableObject {
                 p.currentDirectoryURL = URL(fileURLWithPath: cwd)
                 var env = ProcessInfo.processInfo.environment
                 env["MUG_PROMPT"] = prompt
+                let home = NSHomeDirectory()
+                let extra = ["\(home)/.local/bin", "\(home)/.claude/local", "\(home)/.bun/bin", "\(home)/.npm-global/bin", "/opt/homebrew/bin", "/usr/local/bin"]
+                env["PATH"] = (extra + [env["PATH"] ?? "/usr/bin:/bin:/usr/sbin:/sbin"]).joined(separator: ":")
                 p.environment = env
                 p.standardOutput = out; p.standardError = errHandle ?? out
                 if stdin != nil { p.standardInput = inp } else { p.standardInput = FileHandle.nullDevice }

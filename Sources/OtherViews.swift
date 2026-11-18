@@ -256,7 +256,7 @@ struct HardwareView: View {
                 Field(L.t("hw.bandwidth")) { Text(L.t("unit.gbs", Int(app.hw.bandwidthGBs))).fontWeight(.semibold) }
                 Field(L.t("hw.disk")) { Text(gbText(app.hw.diskFreeGB)).fontWeight(.semibold) }
                 Field(L.t("hw.usable")) { Text(gbText(app.usableGB)).fontWeight(.semibold) }
-            }.card().frame(maxWidth: 560)
+            }.card()
             VStack(alignment: .leading, spacing: 6) {
                 SectionTitle(text: L.t("hw.adjust"))
                 Field(L.t("hw.reserved")) { Stepper(value: $prefs.reservedGB, in: 4...64, step: 2) { Text(gbText(prefs.reservedGB)).fontWeight(.semibold) }.onChange(of: prefs.reservedGB) { _ in app.objectWillChange.send() } }
@@ -265,8 +265,8 @@ struct HardwareView: View {
                         .onChange(of: prefs.manualMemGB) { _ in app.applyManualMemory() }
                 }
                 Text(L.t("hw.note")).font(.system(size: 11)).foregroundColor(p.text2)
-            }.card().frame(maxWidth: 560)
+            }.card()
             Spacer()
-        }.padding(16).font(.system(size: 13))
+        }.frame(maxWidth: 680, alignment: .leading).frame(maxWidth: .infinity).padding(16).font(.system(size: 13))
     }
 }

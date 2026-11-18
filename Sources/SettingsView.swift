@@ -16,9 +16,8 @@ struct SettingsView: View {
         ScrollView {
             VStack(alignment: .leading, spacing: 12) {
                 PaneTitle(text: L.t("nav.settings"))
-                HStack(alignment: .top, spacing: 12) { general.frame(maxWidth: .infinity); hf.frame(maxWidth: .infinity) }
-                HStack(alignment: .top, spacing: 12) { agentBox.frame(maxWidth: .infinity); update.frame(maxWidth: .infinity) }
-            }.padding(16).font(.system(size: 13))
+                general; hf; agentBox; update
+            }.frame(maxWidth: 680, alignment: .leading).frame(maxWidth: .infinity).padding(16).font(.system(size: 13))
         }
     }
 
@@ -78,10 +77,10 @@ struct SettingsView: View {
             Toggle(L.t("upd.auto"), isOn: $prefs.autoUpdate).toggleStyle(MatSwitch())
             HStack {
                 Text(L.t("upd.version", upd.currentVersion)).foregroundColor(p.text2)
+                if !statusText.isEmpty { Text("·  " + statusText).font(.system(size: 12)).foregroundColor(p.text2).lineLimit(1) }
                 Spacer()
-                Text(statusText).font(.system(size: 12)).foregroundColor(p.text2)
-                Button(L.t("upd.check")) { Task { await upd.check() } }.buttonStyle(.mat)
-                if case .available = upd.state { Button(L.t("upd.install")) { Task { await upd.install() } }.buttonStyle(.matPrimary) }
+                Button(L.t("upd.check")) { Task { await upd.check() } }.buttonStyle(.mat).fixedSize()
+                if case .available = upd.state { Button(L.t("upd.install")) { Task { await upd.install() } }.buttonStyle(.matPrimary).fixedSize() }
             }
         }.card()
     }
