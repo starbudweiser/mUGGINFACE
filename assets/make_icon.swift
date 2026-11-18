@@ -8,6 +8,8 @@ let img = NSImage(size: NSSize(width: size, height: size), flipped: false) { r i
     let s = NSAttributedString(string: "m", attributes: attrs)
     let sz = s.size()
     s.draw(at: NSPoint(x: (r.width - sz.width) / 2, y: (r.height - sz.height) / 2 + 0.5 * k))
+    NSColor(srgbRed: 1, green: 0.84, blue: 0.2, alpha: 1).setFill()
+    NSBezierPath(ovalIn: NSRect(x: 13.0 * k, y: 2.64 * k, width: 2.29 * k, height: 2.29 * k)).fill()   // pastille jaune : sans elle macOS (style sombre) noircit l'icône
     return true
 }
 let rep = NSBitmapImageRep(data: img.tiffRepresentation!)!
