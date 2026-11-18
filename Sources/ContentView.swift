@@ -123,13 +123,18 @@ struct ContentView: View {
         }.buttonStyle(.plain)
     }
 
+    /// Règle Socle : rien n'est collé à gauche ; le contenu se centre dans sa zone, à une largeur de lecture limitée.
+    private func centered<V: View>(_ maxW: CGFloat, @ViewBuilder _ v: () -> V) -> some View {
+        v().frame(maxWidth: maxW, maxHeight: .infinity, alignment: .topLeading).frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+    }
+
     @ViewBuilder private var paneView: some View {
         switch nav.pane {
-        case .reco: if let id = nav.detailID { DetailView(id: id) } else { RecoView() }
-        case .favorites: FavoritesView()
-        case .watch: WatchView()
-        case .downloads: DownloadsView()
-        case .agent: AgentView()
+        case .reco: centered(900) { if let id = nav.detailID { DetailView(id: id) } else { RecoView() } }
+        case .favorites: centered(820) { FavoritesView() }
+        case .watch: centered(820) { WatchView() }
+        case .downloads: centered(820) { DownloadsView() }
+        case .agent: centered(1000) { AgentView() }
         case .hardware: HardwareView()
         case .settings: SettingsView()
         }

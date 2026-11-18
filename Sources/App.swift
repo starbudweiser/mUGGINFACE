@@ -72,14 +72,18 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
     func showMain() {
         if window == nil {
-            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1120, height: 730), styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView], backing: .buffered, defer: false)
+            let w = NSWindow(contentRect: NSRect(x: 0, y: 0, width: 1000, height: 733), styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView], backing: .buffered, defer: false)
             w.titlebarAppearsTransparent = true
             w.titleVisibility = .hidden
             w.isReleasedWhenClosed = false
             w.minSize = NSSize(width: 1000, height: 660)
             w.contentViewController = NSHostingController(rootView: ThemeRoot { ContentView() })
-            w.setFrameAutosaveName("mUGGINFACE.main")
-            if !w.setFrameUsingName("mUGGINFACE.main") { w.center() }
+            // Règle Socle : taille par défaut fixe, fenêtre centrée à chaque lancement sur l'écran du pointeur (zone utile), jamais de position restaurée.
+            w.setFrame(NSRect(x: 0, y: 0, width: 1000, height: 733), display: false)   // le contrôleur SwiftUI impose sinon sa taille idéale
+            let pointer = NSEvent.mouseLocation
+            if let zone = (NSScreen.screens.first { NSMouseInRect(pointer, $0.frame, false) } ?? NSScreen.main)?.visibleFrame {
+                w.setFrameOrigin(NSPoint(x: zone.midX - w.frame.width / 2, y: zone.midY - w.frame.height / 2))
+            }
             window = w
         }
         window?.present()
