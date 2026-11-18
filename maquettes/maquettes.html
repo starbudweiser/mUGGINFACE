@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><title>mUGGINFACE — Maquettes (comparaison des designs)</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--rr:20}
+body{font:13px/1.4 -apple-system,"SF Pro Text",system-ui,sans-serif;background:#0b0b0d;color:#eee;-webkit-font-smoothing:antialiased}
+.top{padding:18px 28px 6px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.top h1{font-size:20px;font-weight:700}.top .sub{color:#999}
+.tabs{display:flex;gap:6px;padding:10px 28px;flex-wrap:wrap}
+.tabs button{background:#222;color:#eee;border:0;padding:8px 16px;border-radius:999px;font:inherit;font-weight:500;cursor:pointer}
+.tabs button.on{background:#ffd21e;color:#222}
+.tools{display:none;align-items:center;gap:14px;padding:4px 28px 12px;color:#aaa;flex-wrap:wrap}
+.tools.on{display:flex}
+.tools input[type=range]{width:220px;accent-color:#ffd21e}
+.tools .seg{display:inline-flex;background:#222;border-radius:999px;padding:3px}
+.tools .seg button{border:0;background:none;color:#eee;font:inherit;padding:4px 14px;border-radius:999px;cursor:pointer}
+.tools .seg button.on{background:#444}
+.tools output{color:#fff;font-weight:600;min-width:34px}
+.stage{padding:6px 28px 40px}
+
+/* ---------- fenêtre commune ---------- */
+.win{width:1120px;height:700px;display:grid;grid-template-columns:300px 1fr;grid-template-rows:auto 1fr;overflow:hidden;position:relative;
+ background:var(--bg);color:var(--t);border-radius:var(--rw);box-shadow:var(--sh);font-size:13px}
+.bar{grid-column:1/3;display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:var(--bd)}
+.lights{display:flex;gap:7px}.lights i{width:12px;height:12px;border-radius:50%;display:block}
+.lights i:nth-child(1){background:#ff5f57}.lights i:nth-child(2){background:#febc2e}.lights i:nth-child(3){background:#28c840}
+.brand{font-weight:700;font-size:15px;margin-left:8px}.brand b{color:var(--m)}
+.veille{margin-left:auto;display:flex;align-items:center;gap:8px;color:var(--t2);font-size:12px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ok);box-shadow:0 0 0 3px color-mix(in srgb,var(--ok) 25%,transparent)}
+.btn{background:var(--ctl);color:var(--t);border:0;padding:6px 12px;border-radius:var(--rc);font:inherit;font-weight:500}
+.btn.pri{background:var(--acc);color:var(--onacc)}
+.side{padding:14px;display:flex;flex-direction:column;gap:14px;overflow:hidden;border-right:var(--bd)}
+.main{padding:14px;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.h{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--t2);margin-bottom:6px}
+.box{background:var(--card);border:var(--bd);border-radius:var(--rb);padding:12px;box-shadow:var(--shc)}
+.row{display:flex;justify-content:space-between;align-items:center;padding:3px 0}
+.row span:first-child{color:var(--t2)}
+.sel{display:flex;justify-content:space-between;background:var(--ctl);border-radius:var(--rc);padding:7px 10px;margin-bottom:6px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:5px 11px;border-radius:var(--rch);background:var(--ctl);color:var(--t);font-size:12px;display:inline-flex;gap:6px;align-items:center}
+.chip.on{background:var(--acc);color:var(--onacc);font-weight:600}
+.chip.on::before{content:"✓";font-size:11px}
+.slider{height:6px;border-radius:var(--rch);background:var(--ctl);position:relative;margin:8px 0 4px}
+.slider i{position:absolute;left:0;top:0;bottom:0;width:45%;background:var(--acc);border-radius:inherit}
+.slider u{position:absolute;left:45%;top:50%;width:16px;height:16px;margin:-8px;background:#fff;border-radius:50%;box-shadow:0 1px 4px rgba(0,0,0,.4)}
+.toolbar{display:flex;gap:8px;align-items:center}
+.search{flex:1;background:var(--ctl);border-radius:var(--rc);padding:8px 12px;color:var(--t2)}
+.list{display:flex;flex-direction:column;gap:8px;overflow:hidden}
+.mod{background:var(--card);border:var(--bd);border-radius:var(--rb);padding:12px 14px;display:grid;grid-template-columns:44px 1fr 150px 110px;gap:14px;align-items:center;box-shadow:var(--shc)}
+.mod.first{outline:2px solid var(--acc)}
+.ico{width:44px;height:44px;border-radius:var(--rc);display:grid;place-items:center;font-weight:700;color:#fff;font-size:15px}
+.name{font-weight:650;font-size:14px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sub{color:var(--t2);font-size:12px;margin-top:2px}
+.tag{font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:var(--rch);background:var(--ctl);color:var(--t2)}
+.tag.new{background:var(--acc);color:var(--onacc)}.tag.ok{background:color-mix(in srgb,var(--ok) 22%,transparent);color:var(--ok)}
+.tag.warn{background:color-mix(in srgb,var(--warn) 22%,transparent);color:var(--warn)}
+.bar2{height:6px;border-radius:var(--rch);background:var(--ctl);overflow:hidden;margin-top:5px}.bar2 i{display:block;height:100%;background:var(--acc)}
+.kv{font-size:12px;color:var(--t2)}.kv b{color:var(--t);font-weight:600}
+.score{text-align:right}.score big{font-size:22px;font-weight:700;display:block;line-height:1}.score small{color:var(--t2);font-size:11px}
+.foot{margin-top:auto;display:flex;gap:10px;color:var(--t2);font-size:12px;align-items:center}
+.m{color:var(--m)}
+
+/* ---------- 1. Flat Round (rayon réglable) ---------- */
+[data-d=round]{--rw:calc(var(--rr)*1px + 6px);--rb:calc(var(--rr)*1px);--rc:calc(var(--rr)*.6px);--rch:calc(var(--rr)*1px);--m:#f5b800;--ok:#2fb36a;--warn:#e08a00;
+ --sh:0 24px 60px rgba(0,0,0,.35);--shc:none;--bd:none}
+[data-d=round][data-th=sombre]{--bg:#17171b;--card:#232329;--ctl:#2e2e36;--t:#f4f4f6;--t2:#9a9aa6;--acc:#7c6cff;--onacc:#fff}
+[data-d=round][data-th=clair]{--bg:#f1f1f5;--card:#fff;--ctl:#e8e8ef;--t:#1c1c22;--t2:#6b6b78;--acc:#6a5af0;--onacc:#fff;--sh:0 24px 60px rgba(0,0,0,.18);--shc:0 1px 0 rgba(0,0,0,.04)}
+[data-d=round] .side{border:0}[data-d=round] .bar{border:0}
+[data-d=round] .mod:nth-child(1) .ico{background:#7c6cff}[data-d=round] .mod:nth-child(2) .ico{background:#ff7a59}
+[data-d=round] .mod:nth-child(3) .ico{background:#2fb36a}[data-d=round] .mod:nth-child(4) .ico{background:#19a7ce}
+[data-d=round] .mod:nth-child(5) .ico{background:#e0558a}
+/* ---------- 2. Socle standard ---------- */
+[data-d=socle]{--rw:8px;--rb:6px;--rc:4px;--rch:4px;--bg:#1e1e1e;--card:#222;--ctl:#333;--t:#ddd;--t2:#aaa;--acc:#0369a1;--onacc:#fff;--m:#f59e0b;--ok:#4ade80;--warn:#fbbf24;
+ --sh:0 20px 50px rgba(0,0,0,.5);--shc:none;--bd:1px solid #333;font-size:12.5px}
+[data-d=socle] .ico{background:#333;color:#38bdf8;border-radius:4px;width:34px;height:34px}
+[data-d=socle] .mod{grid-template-columns:34px 1fr 150px 90px;padding:8px 12px}
+[data-d=socle] .box{padding:10px}
+/* ---------- 3. Flat Mat ---------- */
+[data-d=mat]{--rw:12px;--rb:12px;--rc:8px;--rch:999px;--bg:#f4f1ec;--card:#fff;--ctl:#ebe6de;--t:#26231e;--t2:#7b756a;--acc:#26231e;--onacc:#f4f1ec;--m:#d9622b;--ok:#3f8f5a;--warn:#b7791f;
+ --sh:0 18px 50px rgba(60,40,10,.18);--shc:none;--bd:1px solid #e3ddd2}
+[data-d=mat][data-th=sombre]{--bg:#1d1b18;--card:#272420;--ctl:#33302a;--t:#f1ede5;--t2:#9d968a;--acc:#f1ede5;--onacc:#1d1b18;--m:#f08a52;--ok:#6fcf8f;--warn:#e0b04a;--sh:0 18px 50px rgba(0,0,0,.5);--bd:1px solid #38342d}
+[data-d=mat] .ico{background:#26231e;color:#f4f1ec}
+[data-d=mat][data-th=sombre] .ico{background:#f1ede5;color:#1d1b18}
+[data-d=mat] .mod.first{outline-color:#d9622b}
+/* ---------- 4. Verre (Apple Stephan) ---------- */
+[data-d=verre]{--rw:22px;--rb:18px;--rc:12px;--rch:999px;--bg:linear-gradient(135deg,#2a1f5c,#0e4a6b 55%,#14383a);--card:rgba(255,255,255,.10);--ctl:rgba(255,255,255,.14);--t:#fff;--t2:rgba(255,255,255,.66);--acc:#0a84ff;--onacc:#fff;--m:#ffd21e;--ok:#5fe08a;--warn:#ffc04d;
+ --sh:0 30px 70px rgba(0,0,0,.5);--shc:inset 0 1px 0 rgba(255,255,255,.18);--bd:1px solid rgba(255,255,255,.14)}
+[data-d=verre] .box,[data-d=verre] .mod{backdrop-filter:blur(24px) saturate(1.4)}
+[data-d=verre] .ico{background:linear-gradient(135deg,#ffffff55,#ffffff18);border:1px solid rgba(255,255,255,.25)}
+[data-d=verre] .side{background:rgba(255,255,255,.05)}
+.legend{color:#999;padding:0 28px 10px;max-width:1120px}
+</style></head><body>
+<div class="top"><h1><span style="color:#ffd21e">m</span>UGGINFACE — Maquettes</h1><span class="sub">Même écran dans les 4 designs · écran principal : matériel + domaines → modèles classés</span></div>
+<nav class="tabs" id="tabs">
+ <button data-d="round" class="on">Flat Round</button><button data-d="socle">Socle standard</button><button data-d="mat">Flat Mat</button><button data-d="verre">Apple Stephan (verre)</button>
+</nav>
+<div class="tools on" id="tools">
+ <label class="rad">Arrondis des objets</label><input class="rad" type="range" id="rr" min="0" max="32" value="20"><output class="rad" id="rrv">20</output>
+ <span class="seg" id="seg"><button data-th="sombre" class="on">Sombre</button><button data-th="clair">Clair</button></span>
+ <span class="seg rad" id="presets"><button data-v="0">Carré</button><button data-v="10">Doux</button><button data-v="20" class="on">Rond</button><button data-v="32">Très rond</button></span>
+</div>
+<div class="legend" id="legend"></div>
+<div class="stage"><div class="win" id="win" data-d="round" data-th="sombre">
+ <div class="bar"><div class="lights"><i></i><i></i><i></i></div><div class="brand"><b>m</b>UGGINFACE</div>
+  <div class="veille"><span class="dot"></span>Veille active · dernier scan il y a 12 min · <b style="color:var(--t)">3 nouveaux modèles</b><span class="btn">Actualiser</span><span class="btn">⚙</span></div></div>
+ <div class="side">
+  <div><div class="h">Mon matériel</div><div class="box">
+   <div class="sel"><span>Puce / GPU</span><b>Apple M4 Max</b></div>
+   <div class="sel"><span>Mémoire</span><b>64 Go unifiée</b></div>
+   <div class="sel"><span>Disque libre</span><b>420 Go</b></div>
+   <div class="row"><span>Détecté automatiquement</span><span class="tag ok">✓ Mac</span></div></div></div>
+  <div><div class="h">Domaines (plusieurs choix)</div><div class="chips">
+   <span class="chip on">Texte / Chat</span><span class="chip on">Code</span><span class="chip">Image</span><span class="chip">Vidéo</span><span class="chip on">Audio / Voix</span><span class="chip">Vision</span><span class="chip">Embeddings</span><span class="chip">Traduction</span></div></div>
+  <div><div class="h">Filtres</div><div class="box">
+   <div class="row"><span>Poids maxi</span><b>20 Go</b></div><div class="slider"><i></i><u></u></div>
+   <div class="row"><span>Licence libre seule</span><span class="tag ok">Oui</span></div>
+   <div class="row"><span>Format</span><b>MLX · GGUF</b></div></div></div>
+  <span class="btn pri" style="text-align:center;padding:9px">Trouver les modèles</span>
+ </div>
+ <div class="main">
+  <div class="toolbar"><div class="search">⌕  Rechercher un modèle…</div><span class="btn">Tri : Meilleur compromis ▾</span></div>
+  <div class="list">
+   <div class="mod first"><div class="ico">Q</div><div><div class="name">Qwen3-32B-Instruct <span class="tag new">Nouveau</span><span class="tag">Texte</span></div><div class="sub">Qwen · MLX 4 bits · Apache 2.0 · ↑ 18 % cette semaine</div></div>
+    <div class="kv">Poids <b>18 Go</b> · RAM <b>24 Go</b><div class="bar2"><i style="width:38%"></i></div></div><div class="score"><big>9,3</big><small><span class="tag ok">Fluide sur ta machine</span></small></div></div>
+   <div class="mod"><div class="ico">D</div><div><div class="name">DeepSeek-Coder-V3-Lite <span class="tag">Code</span></div><div class="sub">DeepSeek · GGUF Q4 · MIT · 1,2 M téléchargements</div></div>
+    <div class="kv">Poids <b>9 Go</b> · RAM <b>12 Go</b><div class="bar2"><i style="width:19%"></i></div></div><div class="score"><big>9,0</big><small><span class="tag ok">Fluide</span></small></div></div>
+   <div class="mod"><div class="ico">K</div><div><div class="name">Kokoro-TTS-2 <span class="tag new">Nouveau</span><span class="tag">Voix</span></div><div class="sub">Hexgrad · MLX · Apache 2.0 · 12 langues</div></div>
+    <div class="kv">Poids <b>0,4 Go</b> · RAM <b>2 Go</b><div class="bar2"><i style="width:4%"></i></div></div><div class="score"><big>8,8</big><small><span class="tag ok">Très léger</span></small></div></div>
+   <div class="mod"><div class="ico">W</div><div><div class="name">Whisper-large-v4-turbo <span class="tag">Audio</span></div><div class="sub">OpenAI · MLX · MIT · transcription 99 langues</div></div>
+    <div class="kv">Poids <b>1,6 Go</b> · RAM <b>4 Go</b><div class="bar2"><i style="width:8%"></i></div></div><div class="score"><big>8,6</big><small><span class="tag ok">Très léger</span></small></div></div>
+   <div class="mod"><div class="ico">L</div><div><div class="name">Llama-4-Scout-109B <span class="tag">Texte</span></div><div class="sub">Meta · GGUF Q3 · licence Llama</div></div>
+    <div class="kv">Poids <b>46 Go</b> · RAM <b>56 Go</b><div class="bar2"><i style="width:88%"></i></div></div><div class="score"><big>7,9</big><small><span class="tag warn">Limite</span></small></div></div>
+  </div>
+  <div class="foot"><span>5 modèles sur 142 correspondent</span><span style="margin-left:auto">Score = performance (benchmarks) × légèreté pour ton matériel</span></div>
+ </div>
+</div></div>
+<script>
+const win=document.getElementById('win'),rr=document.getElementById('rr'),rrv=document.getElementById('rrv'),tools=document.getElementById('tools'),leg=document.getElementById('legend');
+const L={round:'Flat Round : mat, arrondi, coloré, clair/sombre. Utilise le curseur pour régler les arrondis de tous les objets (cartes, boutons, puces, fenêtre).',
+socle:'Socle standard : sombre, plat, dense, angles droits, un seul accent bleu.',
+mat:'Flat Mat (CHOISI) : fond crème ou charbon, aplats sobres, bordures fines, accent encre/orange (style SOCiALS). Clair / sombre au choix.',
+verre:'Design Apple Stephan : cartes en verre translucide sur fond dégradé, flou et reflets.'};
+function set(d){win.dataset.d=d;document.querySelectorAll('#tabs button').forEach(b=>b.classList.toggle('on',b.dataset.d===d));tools.classList.toggle('on',d==='round'||d==='mat');document.querySelectorAll('.rad').forEach(e=>e.style.display=d==='round'?'':'none');leg.textContent=L[d]}
+document.querySelectorAll('#tabs button').forEach(b=>b.onclick=()=>set(b.dataset.d));
+function rad(v){document.documentElement.style.setProperty('--rr',v);win.style.setProperty('--rr',v);rr.value=v;rrv.textContent=v;document.querySelectorAll('#presets button').forEach(b=>b.classList.toggle('on',+b.dataset.v===+v))}
+rr.oninput=()=>rad(rr.value);
+document.querySelectorAll('#presets button').forEach(b=>b.onclick=()=>rad(b.dataset.v));
+document.querySelectorAll('#seg button').forEach(b=>b.onclick=()=>{win.dataset.th=b.dataset.th;document.querySelectorAll('#seg button').forEach(x=>x.classList.toggle('on',x===b))});
+set('round');
+</script></body></html>
