@@ -49,6 +49,16 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
                 try? (AgentBridge.shared.messages.map(\.text).joined(separator: "\n---\n")).write(toFile: "/tmp/mug_agent_out.txt", atomically: true, encoding: .utf8)
             }
         }
+        if let ids = d.string(forKey: "refgb") {
+            Task { @MainActor in
+                var out = ""
+                for id in ids.split(separator: ",").map(String.init) {
+                    let f = (try? await Hub.files(of: id, token: nil)) ?? []
+                    out += "\(id) \(Hub.referenceGB(f).map { String(format: "%.1f", $0) } ?? "?") Go ; variantes: \(Hub.variants(from: f).map { "\($0.label)=\(String(format: "%.1f", $0.gb))" }.joined(separator: ", "))\n"
+                }
+                try? out.write(toFile: "/tmp/mug_refgb.txt", atomically: true, encoding: .utf8)
+            }
+        }
         if let id = d.string(forKey: "prepare") {
             Task { @MainActor in
                 let files = (try? await Hub.files(of: id, token: nil)) ?? []

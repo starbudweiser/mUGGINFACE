@@ -205,6 +205,7 @@ final class AppModel: ObservableObject {
         timer?.invalidate()
         timer = Timer.scheduledTimer(withTimeInterval: 600, repeats: true) { [weak self] _ in Task { @MainActor in self?.tick() } }
         tick()
+        Task { await refineWeights() }
     }
 
     func tick() {
@@ -232,6 +233,7 @@ final class AppModel: ObservableObject {
                 for var m in list {
                     if var old = models[m.id] {
                         var ds = Set(old.domains); ds.insert(d.rawValue)
+                        if let r = old.realGB, old.lastModified == m.lastModified { m.realGB = r; m.weightsGB = r }   // poids mesuré toujours valable
                         m.domains = Array(ds).sorted(); old = m; models[m.id] = old
                     } else {
                         models[m.id] = m
@@ -261,6 +263,28 @@ final class AppModel: ObservableObject {
         events = Array((newEvents + events).prefix(200))
         save()
         if !newEvents.isEmpty, prefs.notify, !firstEver { notify(newEvents) }
+        await refineWeights()
+    }
+
+    /// Remplace l'estimation (paramètres × bits) par le poids réel lu dans la liste des fichiers du dépôt, pour les modèles affichés d'abord.
+    /// L'estimation se trompe sur les modèles composites (vidéo, image) dont l'API ne compte qu'une partie des paramètres.
+    func refineWeights(limit: Int = 150) async {
+        let doms = prefs.domains.isEmpty ? Set(Domain.allCases) : prefs.domains
+        let todo = rows(domains: doms, filtered: false).filter { $0.model.realGB == nil }.prefix(limit).map { $0.model.id }
+        guard !todo.isEmpty else { return }
+        let tok = token
+        var i = 0
+        while i < todo.count {
+            let chunk = Array(todo[i..<min(i + 4, todo.count)]); i += 4
+            let res = await withTaskGroup(of: (String, Double?).self) { g -> [(String, Double?)] in
+                for id in chunk { g.addTask { (id, (try? await Hub.files(of: id, token: tok)).flatMap { Hub.referenceGB($0) }) } }
+                var out: [(String, Double?)] = []
+                for await r in g { out.append(r) }
+                return out
+            }
+            for (id, gb) in res { if let gb, var m = models[id] { m.realGB = gb; m.weightsGB = gb; models[id] = m } }
+        }
+        save()
     }
 
     private func notify(_ evs: [WatchEvent]) {

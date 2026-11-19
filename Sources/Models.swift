@@ -49,6 +49,7 @@ struct Model: Codable, Identifiable, Hashable {
     var paramsB: Double?
     var license: String?
     var weightsGB: Double?
+    var realGB: Double? = nil      // taille mesurée sur les fichiers réels du dépôt (sinon weightsGB n'est qu'une estimation)
     var format: String            // mlx, gguf, safetensors
     var bits: Double
 

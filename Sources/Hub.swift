@@ -118,7 +118,11 @@ enum Hub {
     static func variants(from files: [RepoFile]) -> [Variant] {
         let ggufs = files.filter { $0.path.lowercased().hasSuffix(".gguf") && !$0.path.lowercased().contains("mmproj") && !$0.path.lowercased().contains("imatrix") }
         let extras = files.filter { !$0.path.lowercased().hasSuffix(".gguf") && !$0.path.hasPrefix(".") && !$0.path.lowercased().hasSuffix(".md") && !$0.path.contains("/") }
-        if !ggufs.isEmpty {
+        // Un dépôt dont les poids sont des points de contrôle safetensors à la racine, avec des GGUF seulement dans des sous-dossiers
+        // (réécrivain de prompt d'un modèle vidéo, par exemple), n'est pas un dépôt GGUF.
+        let rootST = files.contains { !$0.path.contains("/") && $0.path.lowercased().hasSuffix(".safetensors") }
+        let rootGGUF = ggufs.contains { !$0.path.contains("/") }
+        if !ggufs.isEmpty, rootGGUF || !rootST {
             var groups: [String: [RepoFile]] = [:]
             for f in ggufs { groups[quantLabel(f.path), default: []].append(f) }
             return groups.map { Variant(label: $0.key, files: $0.value.sorted { $0.path < $1.path }) }
@@ -133,7 +137,33 @@ enum Hub {
             return !p.hasSuffix(".md") || !f.path.contains("/")
         }
         _ = extras
+        // Dépôt de points de contrôle en fichier unique (vidéo, image : plusieurs précisions côte à côte) : une variante par fichier,
+        // sans les sous-dossiers (réécrivains de prompt, etc.) ; additionner le tout donnerait un poids absurde.
+        let rootWeights = keep.filter { !$0.path.contains("/") && $0.path.lowercased().hasSuffix(".safetensors") }
+        let sharded = files.contains { $0.path.lowercased() == "model.safetensors.index.json" } || rootWeights.contains { $0.path.lowercased().contains("-of-") }
+        if rootWeights.count >= 2, !sharded {
+            let small = keep.filter { !$0.path.contains("/") && !$0.path.lowercased().hasSuffix(".safetensors") }
+            return rootWeights.sorted { $0.size < $1.size }.map { Variant(label: ($0.path as NSString).deletingPathExtension, files: [$0] + small) }
+        }
         return keep.isEmpty ? [] : [Variant(label: fullLabel, files: keep)]
+    }
+
+    /// Poids réel de la variante de référence d'un dépôt (celle que l'estimation vise) : Q4_K_M pour le GGUF, sinon la plus légère des variantes principales
+    /// (les LoRA et fichiers annexes, bien plus petits que le modèle, sont ignorés).
+    static func referenceGB(_ files: [RepoFile]) -> Double? {
+        let vs = variants(from: files)
+        guard let big = vs.map(\.totalBytes).max(), big > 0 else { return nil }
+        if vs.count == 1 { return vs[0].gb }
+        for p in ["Q4_K_M", "Q4_K_S", "Q4_0", "Q4_K_XL", "IQ4_XS", "Q5_K_M", "Q6_K", "Q8_0"] {
+            if let v = vs.first(where: { $0.label.uppercased().hasPrefix(p) }) { return v.gb }
+        }
+        if vs.allSatisfy({ $0.files.allSatisfy { $0.path.lowercased().hasSuffix(".gguf") } }) {
+            // GGUF sans Q4 : ni F16 / BF16 / F32 (poids non quantifiés), puis la médiane des quantifications restantes
+            let q = vs.filter { !["F16", "BF16", "F32"].contains($0.label.uppercased()) && !$0.label.uppercased().hasSuffix("-F16") && !$0.label.uppercased().hasSuffix("-BF16") }
+            if !q.isEmpty { return q[q.count / 2].gb }
+        }
+        let main = vs.filter { Double($0.totalBytes) >= 0.4 * Double(big) }
+        return (main.min { $0.totalBytes < $1.totalBytes } ?? vs[0]).gb
     }
 
     /// Valeur logique (conservée telle quelle pour rester compatible avec les téléchargements enregistrés) de la variante « dépôt complet ».
@@ -143,7 +173,7 @@ enum Hub {
 
     static func quantLabel(_ path: String) -> String {
         let name = (path as NSString).lastPathComponent
-        if let re = try? NSRegularExpression(pattern: "(?i)(I?Q\\d(?:_[A-Z0-9]+)*|BF16|F16|F32)"),
+        if let re = try? NSRegularExpression(pattern: "(?i)(?<![A-Za-z0-9])((?:PT|P|I)?Q\\d(?:_[A-Z0-9]+)*|BF16|F16|F32)"),
            let m = re.firstMatch(in: name, range: NSRange(location: 0, length: (name as NSString).length)) {
             return (name as NSString).substring(with: m.range).uppercased()
         }
