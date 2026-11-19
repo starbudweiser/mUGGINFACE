@@ -101,7 +101,7 @@ final class AgentBridge: ObservableObject {
         switch kind {
         case .claudeAPI: return try await callAPI(prompt)
         case .claudeCode:
-            let allowed = allowTools ? " --allowedTools 'Bash(hf:*)' 'Bash(huggingface-cli:*)' 'Bash(df:*)' 'Bash(ls:*)' 'Bash(du:*)' 'Bash(mkdir:*)' 'Bash(python3 -m mlx_lm:*)' 'Bash(llama-cli:*)'" : ""
+            let allowed = allowTools ? " --allowedTools 'Bash(hf:*)' 'Bash(huggingface-cli:*)' 'Bash(df:*)' 'Bash(ls:*)' 'Bash(du:*)' 'Bash(mkdir:*)' 'Bash(python3 -m mlx_lm:*)' 'Bash(mlx_lm.generate:*)' 'Bash(mlx_lm.benchmark:*)' 'Bash(llama-cli:*)' 'Bash(llama-bench:*)' 'Bash(llama-server:*)' 'Bash(calcul-lourd:*)' 'Bash(find:*)' 'Bash(stat:*)'" : ""
             return try await shell("claude -p \"$MUG_PROMPT\"\(allowed)", prompt: prompt, cwd: allowTools ? prefs.modelsPath : NSHomeDirectory(), stdin: nil)
         case .custom:
             let cmd = prefs.customAgentCmd.trimmingCharacters(in: .whitespaces)
