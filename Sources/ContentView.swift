@@ -61,6 +61,7 @@ struct ContentView: View {
             }.padding(.horizontal, 8).padding(.bottom, 8)
         }
         .background(p.bg).foregroundColor(p.text)
+        .ignoresSafeArea(.container, edges: .top)   // la barre du haut partage la ligne des boutons de fenêtre
         .frame(minWidth: 1000, minHeight: 660)
     }
 
