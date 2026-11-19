@@ -63,7 +63,9 @@ final class AgentBridge: ObservableObject {
         } catch { lastError = error.localizedDescription; messages.append(ChatMessage(role: .system, text: error.localizedDescription)) }
     }
 
+    private var pending: (Model, Variant)?
     func prepareInstall(model: Model, variant: Variant) {
+        pending = (model, variant)
         draftDir = prefs.modelsPath
         draftPrompt = installPrompt(model: model, variant: variant, dir: prefs.modelsPath)
         runLog = ""
@@ -71,6 +73,7 @@ final class AgentBridge: ObservableObject {
 
     /// Envoie l'invite d'installation relue par l'utilisateur ; l'agent agit avec ses propres autorisations.
     func sendDraft() async {
+        if let (m, v) = pending { pending = nil; _ = DownloadManager.shared.enqueue(model: m, variant: v) }   // le téléchargement est fait par l'appli, pas par `hf`
         let p = draftPrompt
         guard !p.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return }
         busy = true; lastError = nil; runLog = L.t("agent.running")
