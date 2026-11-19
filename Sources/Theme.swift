@@ -147,3 +147,18 @@ struct Field: View {
         HStack { Text(label).foregroundColor(p.text2); Spacer(); content }.font(.system(size: 13)).padding(.vertical, 3)
     }
 }
+
+/// Indicateur d'activité en couleur de marque (le ProgressView système reste gris).
+struct Spinner: View {
+    @Environment(\.pal) var p
+    var size: CGFloat = 14
+    @State private var on = false
+    var body: some View {
+        Circle().trim(from: 0, to: 0.75)
+            .stroke(p.brand, style: StrokeStyle(lineWidth: max(2, size / 7), lineCap: .round))
+            .frame(width: size, height: size)
+            .rotationEffect(.degrees(on ? 360 : 0))
+            .animation(.linear(duration: 0.9).repeatForever(autoreverses: false), value: on)
+            .onAppear { on = true }
+    }
+}

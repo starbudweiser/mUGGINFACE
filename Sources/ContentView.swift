@@ -71,7 +71,7 @@ struct ContentView: View {
             HStack(spacing: 8) {
                 Circle().fill(app.scanError == nil ? p.ok : p.warn).frame(width: 8, height: 8)
                 Text(statusText).font(.system(size: 12)).foregroundColor(p.text2)
-                if app.scanning { ProgressView().controlSize(.small) }
+                if app.scanning { Spinner() }
                 Button(L.t("btn.refresh")) { Task { await app.scan() } }.buttonStyle(.mat).disabled(app.scanning)
             }
         }
