@@ -76,6 +76,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             w.titlebarAppearsTransparent = true
             w.titleVisibility = .hidden
             w.isReleasedWhenClosed = false
+            let tb = NSToolbar(identifier: "main"); tb.showsBaselineSeparator = false; w.toolbar = tb; w.toolbarStyle = .unified   // barre de titre plus haute : boutons de fenêtre centrés plus bas, avec de l'air autour du bouton Actualiser
             w.minSize = NSSize(width: 1000, height: 660)
             w.contentViewController = NSHostingController(rootView: ThemeRoot { ContentView() })
             // Règle Socle : taille par défaut fixe, fenêtre centrée à chaque lancement sur l'écran du pointeur (zone utile), jamais de position restaurée.
