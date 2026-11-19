@@ -133,8 +133,13 @@ enum Hub {
             return !p.hasSuffix(".md") || !f.path.contains("/")
         }
         _ = extras
-        return keep.isEmpty ? [] : [Variant(label: "Complet", files: keep)]
+        return keep.isEmpty ? [] : [Variant(label: fullLabel, files: keep)]
     }
+
+    /// Valeur logique (conservée telle quelle pour rester compatible avec les téléchargements enregistrés) de la variante « dépôt complet ».
+    static let fullLabel = "Complet"
+    /// Libellé affiché d'une variante : la variante complète est traduite, les quantifications (Q4_K_M…) restent telles quelles.
+    static func displayLabel(_ label: String) -> String { label == fullLabel ? L.t("variant.full") : label }
 
     static func quantLabel(_ path: String) -> String {
         let name = (path as NSString).lastPathComponent
@@ -148,8 +153,8 @@ enum Hub {
     static func installCommand(id: String, variant: Variant, dir: String) -> String {
         let target = "\(dir)/\(id.split(separator: "/").last ?? "")"
         var cmd = "hf download \(id)"
-        if variant.label != "Complet", variant.files.count == 1 { cmd += " \"\(variant.files[0].path)\"" }
-        else if variant.label != "Complet" { cmd += " --include \"*\(variant.label)*\"" }
+        if variant.label != fullLabel, variant.files.count == 1 { cmd += " \"\(variant.files[0].path)\"" }
+        else if variant.label != fullLabel { cmd += " --include \"*\(variant.label)*\"" }
         return cmd + " --local-dir \"\(target)\""
     }
 }

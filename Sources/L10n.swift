@@ -2,10 +2,13 @@
 import Foundation
 
 enum L {
-    /// Langue du système si elle fait partie des quatre, sinon l'anglais.
+    /// Première langue préférée du système parmi les quatre prises en charge, sinon l'anglais.
     static let lang: String = {
-        let code = String((Locale.preferredLanguages.first ?? "en").prefix(2))
-        return tables[code] != nil ? code : "en"
+        for id in Locale.preferredLanguages {
+            let code = String(id.prefix(2)).lowercased()
+            if tables[code] != nil { return code }
+        }
+        return "en"
     }()
     static var locale: Locale { Locale(identifier: lang) }
     static var languageName: String { ["fr": "français", "en": "English", "es": "español", "it": "italiano"][lang] ?? "English" }
@@ -21,6 +24,15 @@ enum L {
 
     private static let fr: [String: String] = [
         "unit.mb": "%@ Mo",
+        "variant.full": "Complet",
+        "agent.p.hw": "%1$@, %2$@ de mémoire unifiée, %3$@ libres sur le disque",
+        "agent.p.install": "Installe en local le modèle Hugging Face « %1$@ » (variante %2$@, %3$@) dans %4$@.\nMac : %5$@.\n1. Vérifie l'espace disque disponible et la présence de l'outil `hf` (huggingface_hub).\n2. Télécharge : %6$@\n3. Vérifie que les fichiers sont complets, puis teste le modèle avec un court prompt (mlx-lm pour MLX, llama.cpp pour GGUF) et indique le débit mesuré en jetons par seconde.\nDemande-moi confirmation avant d'installer un outil manquant. Réponds en %7$@.",
+        "agent.p.chat": "Tu aides à choisir un modèle d'IA à installer en local. Réponds en %1$@, brièvement, sans exécuter de commande.\nMatériel de l'utilisateur : %2$@. Mémoire utilisable : %3$@. Domaines choisis : %4$@.\nMeilleurs candidats actuels (score estimé, adéquation au Mac) :\n%5$@\nQuand tu recommandes un modèle, écris son identifiant exact « auteur/nom » tel que listé ci-dessus.",
+        "agent.p.row": "- %1$@ : %2$@, %3$@, score %4$@",
+        "agent.p.size.unknown": "taille inconnue",
+        "agent.p.conv": "Conversation :",
+        "agent.p.user": "Utilisateur : ",
+        "agent.p.assistant": "Assistant : ",
         "veille.now": "Veille active · à l'instant",
         "nav.reco": "Recommandations", "nav.favorites": "Favoris", "nav.watch": "Veille", "nav.downloads": "Téléchargements",
         "nav.agent": "Agent IA", "nav.hardware": "Mon matériel", "nav.settings": "Réglages", "menu.about.short": "À propos",
@@ -94,6 +106,15 @@ enum L {
 
     private static let en: [String: String] = [
         "unit.mb": "%@ MB",
+        "variant.full": "Full",
+        "agent.p.hw": "%1$@, %2$@ of unified memory, %3$@ free on the disk",
+        "agent.p.install": "Install the Hugging Face model “%1$@” locally (variant %2$@, %3$@) in %4$@.\nMac: %5$@.\n1. Check the available disk space and that the `hf` tool (huggingface_hub) is installed.\n2. Download: %6$@\n3. Check that the files are complete, then test the model with a short prompt (mlx-lm for MLX, llama.cpp for GGUF) and report the measured speed in tokens per second.\nAsk me for confirmation before installing any missing tool. Answer in %7$@.",
+        "agent.p.chat": "You help the user choose an AI model to install locally. Answer in %1$@, briefly, without running any command.\nUser's hardware: %2$@. Usable memory: %3$@. Chosen domains: %4$@.\nCurrent best candidates (estimated score, fit for this Mac):\n%5$@\nWhen you recommend a model, write its exact identifier “author/name” as listed above.",
+        "agent.p.row": "- %1$@: %2$@, %3$@, score %4$@",
+        "agent.p.size.unknown": "size unknown",
+        "agent.p.conv": "Conversation:",
+        "agent.p.user": "User: ",
+        "agent.p.assistant": "Assistant: ",
         "veille.now": "Watch active · just now",
         "nav.reco": "Recommendations", "nav.favorites": "Favorites", "nav.watch": "Watch", "nav.downloads": "Downloads",
         "nav.agent": "AI agent", "nav.hardware": "My hardware", "nav.settings": "Settings", "menu.about.short": "About",
@@ -167,6 +188,15 @@ enum L {
 
     private static let es: [String: String] = [
         "unit.mb": "%@ MB",
+        "variant.full": "Completo",
+        "agent.p.hw": "%1$@, %2$@ de memoria unificada, %3$@ libres en el disco",
+        "agent.p.install": "Instala en local el modelo de Hugging Face «%1$@» (variante %2$@, %3$@) en %4$@.\nMac: %5$@.\n1. Comprueba el espacio libre en disco y que la herramienta `hf` (huggingface_hub) esté instalada.\n2. Descarga: %6$@\n3. Comprueba que los archivos estén completos y prueba el modelo con un prompt corto (mlx-lm para MLX, llama.cpp para GGUF); indica la velocidad medida en tokens por segundo.\nPídeme confirmación antes de instalar cualquier herramienta que falte. Responde en %7$@.",
+        "agent.p.chat": "Ayudas a elegir un modelo de IA para instalar en local. Responde en %1$@, brevemente, sin ejecutar ningún comando.\nHardware del usuario: %2$@. Memoria utilizable: %3$@. Dominios elegidos: %4$@.\nMejores candidatos actuales (puntuación estimada, adecuación al Mac):\n%5$@\nCuando recomiendes un modelo, escribe su identificador exacto «autor/nombre» tal como aparece arriba.",
+        "agent.p.row": "- %1$@: %2$@, %3$@, puntuación %4$@",
+        "agent.p.size.unknown": "tamaño desconocido",
+        "agent.p.conv": "Conversación:",
+        "agent.p.user": "Usuario: ",
+        "agent.p.assistant": "Asistente: ",
         "veille.now": "Vigilancia activa · ahora mismo",
         "nav.reco": "Recomendaciones", "nav.favorites": "Favoritos", "nav.watch": "Vigilancia", "nav.downloads": "Descargas",
         "nav.agent": "Agente IA", "nav.hardware": "Mi equipo", "nav.settings": "Ajustes", "menu.about.short": "Acerca de",
@@ -240,6 +270,15 @@ enum L {
 
     private static let it: [String: String] = [
         "unit.mb": "%@ MB",
+        "variant.full": "Completo",
+        "agent.p.hw": "%1$@, %2$@ di memoria unificata, %3$@ liberi sul disco",
+        "agent.p.install": "Installa in locale il modello Hugging Face «%1$@» (variante %2$@, %3$@) in %4$@.\nMac: %5$@.\n1. Controlla lo spazio libero su disco e che lo strumento `hf` (huggingface_hub) sia presente.\n2. Scarica: %6$@\n3. Verifica che i file siano completi, poi prova il modello con un breve prompt (mlx-lm per MLX, llama.cpp per GGUF) e indica la velocità misurata in token al secondo.\nChiedimi conferma prima di installare uno strumento mancante. Rispondi in %7$@.",
+        "agent.p.chat": "Aiuti a scegliere un modello di IA da installare in locale. Rispondi in %1$@, brevemente, senza eseguire comandi.\nHardware dell'utente: %2$@. Memoria utilizzabile: %3$@. Domini scelti: %4$@.\nMigliori candidati attuali (punteggio stimato, adeguatezza al Mac):\n%5$@\nQuando consigli un modello, scrivi il suo identificatore esatto «autore/nome» così come elencato sopra.",
+        "agent.p.row": "- %1$@: %2$@, %3$@, punteggio %4$@",
+        "agent.p.size.unknown": "dimensione sconosciuta",
+        "agent.p.conv": "Conversazione:",
+        "agent.p.user": "Utente: ",
+        "agent.p.assistant": "Assistente: ",
         "veille.now": "Monitoraggio attivo · adesso",
         "nav.reco": "Consigli", "nav.favorites": "Preferiti", "nav.watch": "Monitoraggio", "nav.downloads": "Download",
         "nav.agent": "Agente IA", "nav.hardware": "Il mio hardware", "nav.settings": "Impostazioni", "menu.about.short": "Informazioni",

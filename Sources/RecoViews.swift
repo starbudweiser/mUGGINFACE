@@ -211,7 +211,7 @@ struct DetailView: View {
     private func variantRow(_ m: Model, _ v: Variant, recommended: Bool) -> some View {
         let f = Scoring.fit(weightsGB: v.gb, domain: nil, hw: app.hw, reservedGB: prefs.reservedGB)
         return HStack(spacing: 10) {
-            Text(v.label).fontWeight(.semibold)
+            Text(Hub.displayLabel(v.label)).fontWeight(.semibold)
             Text(gbText(v.gb)).foregroundColor(p.text2)
             Tag(text: L.t(f.level.tagKey), kind: fitKind(f.level))
             if recommended { Tag(text: L.t("tag.recommended"), kind: .ok) }

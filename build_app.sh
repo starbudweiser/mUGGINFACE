@@ -12,6 +12,8 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 swiftc -O -swift-version 5 -parse-as-library -target arm64-apple-macos15 -o "$APP/Contents/MacOS/mUGGINFACE" Sources/*.swift
 cp assets/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 cp Resources/Info.plist "$APP/Contents/Info.plist"
+# Descriptions des autorisations dans les 4 langues
+for l in fr en es it; do mkdir -p "$APP/Contents/Resources/$l.lproj"; cp "Resources/$l.lproj/InfoPlist.strings" "$APP/Contents/Resources/$l.lproj/InfoPlist.strings"; done
 if [ -n "${DEV:-}" ]; then
   /usr/libexec/PlistBuddy -c "Set :CFBundleIdentifier fr.stephan.mugginface.dev" "$APP/Contents/Info.plist"
   /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName mUGGINFACE dev" "$APP/Contents/Info.plist"

@@ -30,35 +30,22 @@ final class AgentBridge: ObservableObject {
 
     func hardwareLine() -> String {
         let hw = AppModel.shared.hw
-        return "\(hw.chip), \(Int(hw.memGB)) Go de mémoire unifiée, \(Int(hw.diskFreeGB)) Go libres sur le disque"
+        return L.t("agent.p.hw", hw.chip, L.t("unit.gb", String(Int(hw.memGB))), L.t("unit.gb", String(Int(hw.diskFreeGB))))
     }
 
     func installPrompt(model: Model, variant: Variant, dir: String) -> String {
         let target = (dir as NSString).appendingPathComponent(model.shortName)
         let cmd = Hub.installCommand(id: model.id, variant: variant, dir: dir)
-        return """
-        Installe en local le modèle Hugging Face « \(model.id) » (variante \(variant.label), \(String(format: "%.1f", variant.gb)) Go) dans \(target).
-        Mac : \(hardwareLine()).
-        1. Vérifie l'espace disque disponible et la présence de l'outil `hf` (huggingface_hub).
-        2. Télécharge : \(cmd)
-        3. Vérifie que les fichiers sont complets, puis teste le modèle avec un court prompt (mlx-lm pour MLX, llama.cpp pour GGUF) et indique le débit mesuré en jetons par seconde.
-        Demande-moi confirmation avant d'installer un outil manquant. Réponds en \(L.languageName).
-        """
+        return L.t("agent.p.install", model.id, Hub.displayLabel(variant.label), L.t("unit.gb", String(format: "%.1f", variant.gb)), target, hardwareLine(), cmd, L.languageName)
     }
 
     func chatContext() -> String {
         let app = AppModel.shared
         let doms = app.prefs.domains.map { L.t($0.titleKey) }.sorted().joined(separator: ", ")
         let top = app.rows(domains: app.prefs.domains).prefix(8).map {
-            "- \($0.model.id) : \($0.model.weightsGB.map { String(format: "%.1f Go", $0) } ?? "taille inconnue"), \(L.t($0.fit.level.tagKey)), score \(String(format: "%.1f", $0.score))"
+            L.t("agent.p.row", $0.model.id, $0.model.weightsGB.map { L.t("unit.gb", String(format: "%.1f", $0)) } ?? L.t("agent.p.size.unknown"), L.t($0.fit.level.tagKey), String(format: "%.1f", $0.score))
         }.joined(separator: "\n")
-        return """
-        Tu aides à choisir un modèle d'IA à installer en local. Réponds en \(L.languageName), brièvement, sans exécuter de commande.
-        Matériel de l'utilisateur : \(hardwareLine()). Mémoire utilisable : \(Int(app.usableGB)) Go. Domaines choisis : \(doms).
-        Meilleurs candidats actuels (score estimé, adéquation au Mac) :
-        \(top)
-        Quand tu recommandes un modèle, écris son identifiant exact « auteur/nom » tel que listé ci-dessus.
-        """
+        return L.t("agent.p.chat", L.languageName, hardwareLine(), L.t("unit.gb", String(Int(app.usableGB))), doms, top)
     }
 
     // MARK: - Discussion
@@ -67,8 +54,8 @@ final class AgentBridge: ObservableObject {
         messages.append(ChatMessage(role: .user, text: question))
         busy = true; lastError = nil
         defer { busy = false }
-        let history = messages.suffix(8).map { ($0.role == .user ? "Utilisateur : " : "Assistant : ") + $0.text }.joined(separator: "\n")
-        let prompt = chatContext() + "\n\nConversation :\n" + history + "\nAssistant :"
+        let history = messages.suffix(8).map { ($0.role == .user ? L.t("agent.p.user") : L.t("agent.p.assistant")) + $0.text }.joined(separator: "\n")
+        let prompt = chatContext() + "\n\n" + L.t("agent.p.conv") + "\n" + history + "\n" + L.t("agent.p.assistant").trimmingCharacters(in: .whitespaces)
         do {
             let answer = try await run(prompt: prompt, allowTools: false)
             let ids = AppModel.shared.models.keys.filter { answer.contains($0) }

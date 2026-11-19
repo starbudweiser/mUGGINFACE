@@ -45,7 +45,7 @@ final class Prefs: ObservableObject {
         appearance = Appearance(rawValue: d.string(forKey: "appearance") ?? "") ?? .auto
         showIn = ShowIn(rawValue: d.string(forKey: "showIn") ?? "") ?? .both
         reservedGB = n("reservedGB", 16)
-        modelsDir = d.string(forKey: "modelsDir") ?? "~/Modèles"
+        modelsDir = d.string(forKey: "modelsDir") ?? Prefs.defaultModelsDir()
         scanHour = Int(n("scanHour", 9))
         notify = b("notify", true)
         onlyMyDomains = b("onlyMyDomains", true)
@@ -66,6 +66,18 @@ final class Prefs: ObservableObject {
     var formats: Set<String> {
         get { Set(formatsRaw.split(separator: ",").map(String.init)) }
         set { formatsRaw = ["mlx", "gguf", "safetensors"].filter { newValue.contains($0) }.joined(separator: ",") }
+    }
+    /// Dossier des modèles par défaut : « ~/Modèles » s'il existe déjà (compatibilité avec les installations existantes),
+    /// sinon un nom localisé. Le choix est enregistré pour rester stable si la langue change ensuite.
+    static func defaultModelsDir() -> String {
+        let legacy = "~/Modèles"
+        let fm = FileManager.default
+        var choice = legacy
+        if !fm.fileExists(atPath: (legacy as NSString).expandingTildeInPath) {
+            choice = "~/" + (["fr": "Modèles", "en": "Models", "es": "Modelos", "it": "Modelli"][L.lang] ?? "Models")
+        }
+        UserDefaults.standard.set(choice, forKey: "modelsDir")
+        return choice
     }
     var modelsPath: String { (modelsDir as NSString).expandingTildeInPath }
 }

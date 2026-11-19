@@ -5,7 +5,14 @@ mUGGINFACE is a native macOS app (part of the DESKTOP MAC TOOLKIT) that lists th
 
 ![The mUGGINFACE recommendations list for video models, with the detected Mac, size and score of each model.](docs/screenshot.png)
 
-## Utilisation
+## Usage
+- Run `./build_app.sh` (installs into `~/Applications/Applications Personnelles`); `DEV=1 ./build_app.sh` builds the development version (`fr.stephan.mugginface.dev`, separate data).
+- Mockups: `maquettes/`. Architecture: `ARCHITECTURE.md`.
+- Scores are estimates (size, popularity, trend, freshness), not official benchmarks.
+
+## Français
+
+### Utilisation
 - Lancer `./build_app.sh` (installe dans `~/Applications/Applications Personnelles`) ; `DEV=1 ./build_app.sh` construit la version de développement (`fr.stephan.mugginface.dev`, données séparées).
 - Maquettes : `maquettes/`. Architecture : `ARCHITECTURE.md`.
 - Les scores sont des estimations (taille, popularité, tendance, fraîcheur), pas des benchmarks officiels.

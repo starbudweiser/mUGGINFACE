@@ -102,7 +102,7 @@ struct DownloadsView: View {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 7) {
                     Text(it.modelID.split(separator: "/").last.map(String.init) ?? it.modelID).font(.system(size: 14, weight: .semibold))
-                    Text("· " + it.label).foregroundColor(p.text2)
+                    Text("· " + Hub.displayLabel(it.label)).foregroundColor(p.text2)
                     stateTag(it)
                 }
                 Text(subtitle(it)).font(.system(size: 12)).foregroundColor(p.text2).lineLimit(2)
