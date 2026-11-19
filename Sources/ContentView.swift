@@ -76,7 +76,7 @@ struct ContentView: View {
                 Button(L.t("btn.refresh")) { Task { await app.scan() } }.buttonStyle(.mat).disabled(app.scanning)
             }
         }
-        .padding(.horizontal, 16).padding(.vertical, 10).padding(.leading, 62)
+        .padding(.horizontal, 16).padding(.leading, 62).frame(height: 30).padding(.top, 0).padding(.bottom, 8)   // centré sur l'axe des boutons de fenêtre
     }
 
     private var statusText: String {
