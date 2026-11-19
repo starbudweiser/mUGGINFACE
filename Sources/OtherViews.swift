@@ -184,7 +184,7 @@ struct AgentView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         if agent.messages.isEmpty { Text(L.t("agent.hint")).foregroundColor(p.text2) }
                         ForEach(agent.messages) { m in bubble(m).id(m.id) }
-                        if agent.busy { HStack { Spinner(); Text(L.t("agent.thinking")).foregroundColor(p.text2) } }
+                        if agent.busy { HStack { Spinner(kind: .thinking); Text(L.t("agent.thinking")).foregroundColor(p.text2) } }
                     }.frame(maxWidth: .infinity, alignment: .leading)
                 }.onChange(of: agent.messages.count) { _ in if let l = agent.messages.last { proxy.scrollTo(l.id) } }
             }
@@ -226,7 +226,7 @@ struct AgentView: View {
                     Button(L.t("agent.send.install")) { Task { await agent.sendDraft() } }.buttonStyle(.matPrimary).disabled(agent.busy).frame(maxWidth: .infinity)
                 }
                 Text(L.t("agent.safety")).font(.system(size: 11)).foregroundColor(p.text2)
-                if agent.busy { HStack { Spinner(); Text(L.t("agent.running")).foregroundColor(p.text2) } }
+                if agent.busy { HStack { Spinner(kind: .working); Text(L.t("agent.running")).foregroundColor(p.text2) } }
                 if let e = agent.lastError { Text(e).font(.system(size: 12)).foregroundColor(p.danger).textSelection(.enabled) }
                 if !agent.runLog.isEmpty && !agent.busy {
                     ScrollView { Text(agent.runLog).font(.system(size: 11.5, design: .monospaced)).textSelection(.enabled).frame(maxWidth: .infinity, alignment: .leading) }

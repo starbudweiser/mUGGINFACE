@@ -86,7 +86,7 @@ struct RecoView: View {
     @ViewBuilder private var empty: some View {
         VStack(spacing: 10) {
             Spacer()
-            if app.scanning { Spinner(size: 16); Text(L.t("veille.scanning")).foregroundColor(p.text2) }
+            if app.scanning { Spinner(kind: .scanning, size: 16); Text(L.t("veille.scanning")).foregroundColor(p.text2) }
             else if let e = app.scanError { Text(L.t("veille.error", e)).foregroundColor(p.warn); Button(L.t("btn.retry")) { Task { await app.scan() } }.buttonStyle(.matPrimary) }
             else { Text(L.t("reco.empty")).foregroundColor(p.text2) }
             Spacer()
@@ -185,7 +185,7 @@ struct DetailView: View {
                 }
                 VStack(alignment: .leading, spacing: 8) {
                     SectionTitle(text: L.t("detail.variants"))
-                    if loading { HStack { Spinner(); Text(L.t("detail.loading")).foregroundColor(p.text2) } }
+                    if loading { HStack { Spinner(kind: .loading); Text(L.t("detail.loading")).foregroundColor(p.text2) } }
                     else if let e = loadError { Text(L.t("veille.error", e)).foregroundColor(p.warn) }
                     else if variants.isEmpty { Text(L.t("detail.novariant")).foregroundColor(p.text2) }
                     ForEach(variants) { v in variantRow(m, v, recommended: v.id == rec?.id) }

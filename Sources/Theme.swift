@@ -148,17 +148,24 @@ struct Field: View {
     }
 }
 
-/// Indicateur d'activité en couleur de marque (le ProgressView système reste gris).
+/// Indicateur d'activité en couleur de marque, avec une icône propre à chaque situation.
 struct Spinner: View {
+    enum Kind { case thinking, working, scanning, loading, generic
+        var symbol: String { switch self { case .thinking: return "sparkles"; case .working: return "gearshape.2.fill"; case .scanning: return "antenna.radiowaves.left.and.right"; case .loading: return "arrow.down.circle.fill"; case .generic: return "arrow.triangle.2.circlepath" } }
+    }
     @Environment(\.pal) var p
+    var kind: Kind = .generic
     var size: CGFloat = 14
     @State private var on = false
     var body: some View {
-        Circle().trim(from: 0, to: 0.75)
-            .stroke(p.brand, style: StrokeStyle(lineWidth: max(2, size / 7), lineCap: .round))
-            .frame(width: size, height: size)
-            .rotationEffect(.degrees(on ? 360 : 0))
-            .animation(.linear(duration: 0.9).repeatForever(autoreverses: false), value: on)
-            .onAppear { on = true }
+        Group {
+            switch kind {
+            case .thinking: Image(systemName: kind.symbol).symbolEffect(.variableColor.iterative.reversing, isActive: true)
+            case .scanning: Image(systemName: kind.symbol).symbolEffect(.variableColor.iterative, isActive: true)
+            case .loading: Image(systemName: kind.symbol).symbolEffect(.bounce, options: .repeating, isActive: true)
+            case .working, .generic: Image(systemName: kind.symbol).rotationEffect(.degrees(on ? 360 : 0)).animation(.linear(duration: kind == .working ? 2.4 : 1.0).repeatForever(autoreverses: false), value: on).onAppear { on = true }
+            }
+        }
+        .font(.system(size: size, weight: .semibold)).foregroundColor(p.brand).frame(width: size + 4, height: size + 4)
     }
 }
