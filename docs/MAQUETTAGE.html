@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><title>mUGGINFACE — Document de maquettage</title>
+<style>
+@page { size: A4; margin: 16mm 14mm }
+*{box-sizing:border-box} body{font:10.5pt/1.5 -apple-system,"SF Pro Text",Helvetica,Arial,sans-serif;color:#26231e;margin:0}
+h1{font-size:26pt;margin:0 0 4pt} h1 span{color:#d9622b} h2{font-size:15pt;margin:0 0 6pt;border-bottom:2px solid #d9622b;padding-bottom:3pt;break-after:avoid}
+h3{font-size:11.5pt;margin:10pt 0 3pt} p{margin:4pt 0} code{font-family:"SF Mono",Menlo,monospace;font-size:8.8pt;background:#f0ece4;padding:0 3pt;border-radius:3pt}
+table{border-collapse:collapse;width:100%;margin:6pt 0;break-inside:avoid} th,td{border:1px solid #e3ddd2;padding:4pt 6pt;text-align:left;vertical-align:top;font-size:9.5pt} th{background:#f4f1ec}
+ul{margin:4pt 0 4pt 16pt;padding:0} li{margin:2pt 0}
+.page{break-before:page} .cover{height:250mm;display:flex;flex-direction:column;justify-content:center}
+.shot{width:100%;border:1px solid #e3ddd2;border-radius:8pt;margin:6pt 0} .sw{display:inline-block;width:46pt;height:22pt;border-radius:5pt;border:1px solid #0002;vertical-align:middle;margin-right:4pt}
+.row{display:flex;gap:14pt} .row>div{flex:1}
+.spec{background:#f4f1ec;border-radius:8pt;padding:8pt 10pt;margin:6pt 0;break-inside:avoid}
+.grid3{display:flex;gap:8pt;margin:8pt 0} .grid3>div{flex:1;background:#232327;color:#f5f5f7;border-radius:8pt;padding:8pt;font-size:9pt}
+.grid3 b{display:block;font-size:15pt}
+</style></head><body>
+
+<div class="cover">
+<h1><span>m</span>UGGINFACE</h1>
+<div style="font-size:18pt;margin-bottom:10pt">Document de maquettage</div>
+<div style="color:#7b756a;font-size:12pt">Design Flat Mat · écrans, composants, règles d'alignement, volet Audit<br>Version 1.0.12 + Audit · novembre 2026 · DESKTOP MAC TOOLKIT</div>
+<p style="margin-top:26pt;max-width:130mm">Les captures sont celles de l'application réelle (version de développement, thème sombre). Les maquettes comparatives des 4 designs (Socle, Apple Stephan, Flat Mat, Flat Round) sont dans <code>maquettes/maquettes.html</code> et <code>maquettes/maquettes-flatmat.html</code> ; le design retenu est <b>Flat Mat</b>, clair et sombre.</p>
+</div>
+
+<div class="page"><h2>1. Système de design Flat Mat</h2>
+<h3>Palette</h3>
+<table><tr><th>Jeton</th><th>Clair</th><th>Sombre</th><th>Usage</th></tr>
+<tr><td>bg / win</td><td><span class="sw" style="background:#F4F1EC"></span>#F4F1EC</td><td><span class="sw" style="background:#131316"></span>#131316 / #1C1C1F</td><td>Fond de fenêtre, zone de contenu</td></tr>
+<tr><td>card</td><td><span class="sw" style="background:#fff"></span>#FFFFFF</td><td><span class="sw" style="background:#232327"></span>#232327</td><td>Cartes</td></tr>
+<tr><td>ctl</td><td><span class="sw" style="background:#EBE6DE"></span>#EBE6DE</td><td><span class="sw" style="background:#2C2C31"></span>#2C2C31</td><td>Boutons, champs, puces</td></tr>
+<tr><td>text / text2</td><td><span class="sw" style="background:#26231E"></span>#26231E / #7B756A</td><td><span class="sw" style="background:#F5F5F7"></span>#F5F5F7 / #98989F</td><td>Texte, texte secondaire</td></tr>
+<tr><td>acc</td><td><span class="sw" style="background:#26231E"></span>#26231E</td><td><span class="sw" style="background:#0A84FF"></span>#0A84FF</td><td>Action principale</td></tr>
+<tr><td>brand</td><td><span class="sw" style="background:#D9622B"></span>#D9622B</td><td><span class="sw" style="background:#F08A52"></span>#F08A52</td><td>« m » du nom, badges Nouveau, liens de candidat</td></tr>
+<tr><td>ok / warn / danger</td><td colspan="2"><span class="sw" style="background:#3F8F5A"></span><span class="sw" style="background:#B7791F"></span><span class="sw" style="background:#B93A2E"></span> (clair) · <span class="sw" style="background:#30D158"></span><span class="sw" style="background:#FF9F0A"></span><span class="sw" style="background:#FF453A"></span> (sombre)</td><td>Fluide / À jour, Limite / Mieux disponible, erreur</td></tr>
+<tr><td>border</td><td><span class="sw" style="background:#E3DDD2"></span>#E3DDD2</td><td><span class="sw" style="background:#303035"></span>#303035</td><td>Liserés de 0,5 pt</td></tr></table>
+<h3>Composants</h3>
+<table><tr><th>Composant</th><th>Spécification</th></tr>
+<tr><td>Carte</td><td>Marge interne 14 pt, rayon 12 (continu), liseré 0,5 pt, fond <i>card</i>. Le <b>cadre de largeur se pose avant la carte</b> pour que le fond couvre toute la largeur.</td></tr>
+<tr><td>Bouton</td><td>12,5 pt semi-gras, marges 12 × 6, rayon 9 ; primaire = fond <i>acc</i> texte <i>onAcc</i> ; secondaire = fond <i>ctl</i>.</td></tr>
+<tr><td>Étiquette (Tag)</td><td>10,5 pt semi-gras, capsule, marges 8 × 2 ; variantes plain, new (brand), ok, warn, danger (fond à 20 % de la couleur).</td></tr>
+<tr><td>Puce de filtre (Chip)</td><td>Capsule 12,5 pt, coche à gauche quand active, fond <i>acc</i>.</td></tr>
+<tr><td>Titre de section</td><td>11 pt semi-gras, majuscules, espacement 0,5, texte secondaire.</td></tr>
+<tr><td>Titre de volet</td><td>18 pt gras, bouton d'action à droite.</td></tr>
+<tr><td>Interrupteur</td><td>36 × 20, pastille 16, fond <i>acc</i> quand actif.</td></tr>
+<tr><td>Nom de l'appli</td><td>« m » en couleur <i>brand</i>, le reste en texte ; jamais coloré dans un menu déroulant.</td></tr></table>
+<h3>Règles de composition</h3>
+<ul><li>Fenêtre minimale 1000 × 660. Barre du haut de 52 pt partageant la ligne des boutons de fenêtre (retrait gauche 104). Barre latérale de 214 pt, carte arrondie ; zone de contenu en carte arrondie à droite.</li>
+<li>Rien n'est collé à gauche : le contenu se centre dans sa zone, largeur de lecture limitée (Recommandations 900, Favoris / Veille / Téléchargements 820, Agent 1000, Audit 900, Matériel et Réglages pleine zone).</li>
+<li><b>Alignement</b> : cartes d'une même rangée = même largeur et même hauteur ; colonnes de listes à largeur fixe (valeurs à droite) ; marges de 16 pt autour du contenu, 12 pt entre cartes ; pas de carte plus étroite que sa rangée.</li>
+<li>Clair / sombre automatiques (réglable). Tous les textes dans les 4 langues, la place doit absorber les traductions (troncature au milieu pour les noms).</li></ul></div>
+
+<div class="page"><h2>2. Carte de navigation</h2>
+<table><tr><th>Entrée</th><th>Contenu</th><th>Actions principales</th></tr>
+<tr><td>Recommandations</td><td>Domaines, Mon Mac, filtres, liste, fiche détaillée</td><td>Filtrer, trier, ouvrir une fiche, télécharger, envoyer à l'agent, favori</td></tr>
+<tr><td>Favoris</td><td>Modèles suivis</td><td>Ouvrir la fiche</td></tr>
+<tr><td>Veille (compteur)</td><td>Nouveau / Entre / Monte / Retiré, fréquence, alertes</td><td>Tout marquer comme lu, ouvrir une fiche</td></tr>
+<tr><td><b>Audit</b></td><td>Résumé, évolution, modèles installés par domaine, dossiers analysés</td><td>Lancer l'audit, ouvrir le meilleur candidat, ajouter un dossier</td></tr>
+<tr><td>Téléchargements (compteur)</td><td>File, progression, vérifications</td><td>Pause, reprendre, afficher, tester via l'agent</td></tr>
+<tr><td>Agent IA</td><td>Discussion + instructions à relire</td><td>Envoyer, changer d'agent</td></tr>
+<tr><td>Mon matériel</td><td>Puce, mémoire, disque, débit</td><td>Réserve système, mémoire manuelle</td></tr>
+<tr><td>Réglages, À propos</td><td>Préférences, jeton, mises à jour</td><td>—</td></tr></table>
+<h3>Recommandations</h3><img class="shot" src="img/reco.png">
+<h3>Veille</h3><img class="shot" src="img/veille.png"></div>
+
+<div class="page"><h2>3. Écrans existants</h2>
+<h3>Téléchargements</h3><img class="shot" src="img/telechargements.png">
+<h3>Agent IA</h3><img class="shot" src="img/agent.png"></div>
+<div class="page"><h3>Mon matériel</h3><img class="shot" src="img/materiel.png">
+<h3>Réglages</h3><img class="shot" src="img/reglages.png"></div>
+
+<div class="page"><h2>4. Nouveau volet : Audit</h2>
+<p>But : comparer les modèles installés sur ce Mac aux meilleurs candidats du catalogue et suivre l'évolution de l'atelier.</p>
+<img class="shot" src="img/audit.png">
+<h3>Anatomie (de haut en bas)</h3>
+<div class="spec"><b>1. Titre de volet</b> « Audit de mes modèles », bouton primaire « Lancer l'audit » à droite (remplacé par un indicateur d'activité + libellé pendant l'analyse).<br>
+<b>2. Résumé</b> : 3 cartes égales — Modèles installés (nombre, taille totale) · Indice d'atelier (pourcentage, écart en points avec l'audit précédent, aide) · Mises à niveau possibles (nombre, « n à jour »).<br>
+<b>3. Évolution</b> : barres des 14 derniers audits (valeur au-dessus, date dessous, dernier en couleur de marque) ; texte d'attente tant qu'un seul audit existe ; lignes « Installés depuis… » (vert) et « Retirés depuis… ».<br>
+<b>4. Une carte par domaine</b> (Voix / Audio, Texte, Image…, puis « Autres / hors catalogue »), lignes séparées par un filet.<br>
+<b>5. Dossiers analysés</b> : texte d'aide, liste des dossiers ajoutés (bouton Retirer), « Ajouter un dossier… », interrupteur d'audit automatique, note « estimé / mesuré ».</div>
+<h3>Ligne de modèle — colonnes</h3>
+<table><tr><th>Colonne</th><th>Largeur</th><th>Alignement</th><th>Contenu</th></tr>
+<tr><td>Nom</td><td>flexible</td><td>gauche, tronqué au milieu</td><td>Nom court, semi-gras</td></tr>
+<tr><td>Source</td><td>140</td><td>gauche</td><td>Étiquette : Cache Hugging Face, mUGGINFACE, Ollama, LM Studio, Dossier</td></tr>
+<tr><td>Taille</td><td>64</td><td>droite</td><td>« 2.9 Go »</td></tr>
+<tr><td>Score</td><td>104</td><td>droite</td><td>« 5.4 · estimé »</td></tr>
+<tr><td>Verdict</td><td>120</td><td>droite</td><td>À jour (vert) · Mieux disponible (orange) · Hors catalogue (neutre)</td></tr></table>
+<p>Sous-ligne si « Mieux disponible » : flèche, nom du candidat (couleur de marque, clic = fiche), gain « +23 % » (vert), adéquation (Fluide / Compatible / Limite), RAM. Ligne grise facultative : « Mesuré · benchmark : valeur contre valeur » ou « n benchmarks publics publiés (mesurés) ».</p>
+<h3>États</h3>
+<table><tr><th>État</th><th>Affichage</th></tr>
+<tr><td>Jamais lancé / liste vide</td><td>Carte d'explication + date du dernier audit ; l'audit se lance seul à l'ouverture.</td></tr>
+<tr><td>En cours</td><td>Indicateur « scanning » et « Analyse en cours… » à côté du bouton (désactivé).</td></tr>
+<tr><td>Un seul audit</td><td>Texte « Un deuxième audit, un autre jour, fera apparaître la courbe d'évolution. »</td></tr>
+<tr><td>Aucun candidat meilleur</td><td>Étiquette « À jour », pas de sous-ligne.</td></tr>
+<tr><td>Modèle inconnu</td><td>Rangé dans « Autres / hors catalogue », étiquette neutre, pas de score.</td></tr></table></div>
+
+<div class="page"><h2>4 bis. Audit : analyse de l'agent et plan de mise à jour</h2>
+<img class="shot" src="img/audit-analyse.png">
+<img class="shot" src="img/audit-plan.png">
+<h3>Cartes ajoutées (sous la liste des domaines)</h3>
+<div class="spec"><b>Analyse de l'agent</b> : titre de section à gauche, à droite l'indicateur d'activité et le bouton primaire « Analyser avec l'agent » (devient « Relancer l'analyse »). Texte en prose avec titres en gras, sélectionnable ; pied « Rédigée le … · agent : … ». Erreur en rouge sous le texte.<br>
+<b>Plan de mise à jour</b> : aide en deux lignes ; une ligne par mise à niveau possible (interrupteur à droite, ancien nom → candidat en couleur de marque, gain vert) ; bouton « Préparer le plan ». Une fois le plan rédigé : zone de texte éditable (220 pt, fond de contrôle, rayon 9), liste des fichiers d'instructions (bouton Retirer, « Ajouter un fichier ou un dossier… »), avertissement orange si l'agent est l'API, bouton primaire « Exécuter le plan ».<br>
+<b>Historique des mises à jour</b> : une ligne par plan (date en gras, étiquette Préparé / Exécuté en vert / Échec en rouge / Annulé, nombre de téléchargements notés), boutons « Afficher le dossier » et « Annuler cette mise à jour », résultat de l'agent en 4 lignes max.</div>
+<h3>Dialogues de confirmation</h3>
+<table><tr><th>Dialogue</th><th>Texte (résumé)</th><th>Boutons</th></tr>
+<tr><td>Exécuter le plan ?</td><td>« n élément(s) sont sauvegardés avant. Les anciens modèles sont conservés, les nouveaux installés à côté. Tu pourras tout annuler. »</td><td>Exécuter le plan · Annuler</td></tr>
+<tr><td>Annuler la mise à jour ?</td><td>« Les fichiers d'instructions sont restaurés depuis la sauvegarde (la version actuelle est gardée à côté) et les modèles téléchargés par ce plan vont à la corbeille. Les anciens modèles n'ont pas été touchés. »</td><td>Annuler cette mise à jour (destructif) · Annuler</td></tr></table>
+<h3>Principes de conception</h3>
+<ul><li>Rien ne s'exécute sans validation explicite ; le plan est toujours relu et modifiable.</li>
+<li>La réversibilité est visible : mention « tout est réversible » dans l'aide, bouton d'annulation sur chaque mise à jour exécutée, résultat de l'annulation affiché en vert sous la carte.</li>
+<li>Les cartes gardent la règle d'alignement : même largeur que le reste du volet, marges 14, interrupteurs alignés à droite.</li></ul></div>
+
+<div class="page"><h2>5. Variantes de présentation étudiées pour l'Audit</h2>
+<div class="row"><div><h3>A · Cartes par domaine (retenue)</h3><p>Lecture par usage (voix, texte, image…), comme le reste de l'appli. Résumé en tête, évolution, puis détail.</p></div>
+<div><h3>B · Tableau unique triable</h3><p>Une seule table (nom, domaine, source, taille, score, gain). Plus dense, perd le regroupement par usage ; à garder pour une future option d'export.</p></div>
+<div><h3>C · Tableau de bord seulement</h3><p>Indice + courbe + liste des mises à niveau. Plus léger, mais cache les modèles à jour que l'on veut vérifier.</p></div></div>
+<h3>Évolutions de maquette à prévoir</h3>
+<ul><li>Filtre par domaine et par verdict en haut de la liste (puces Chip).</li>
+<li>Bouton « Envoyer à l'agent » sur une ligne « Mieux disponible » (installation du candidat).</li>
+<li>Courbe par domaine en plus de l'indice global ; export CSV de l'historique.</li>
+<li>Variante Flat Round (arrondis réglables) : mêmes colonnes, rayon de carte et de capsule pilotés par le curseur d'arrondis.</li></ul>
+<h3>Checklist de validation visuelle</h3>
+<ul><li>Cartes de résumé de même largeur et hauteur ; aucune carte plus étroite que la colonne.</li>
+<li>Colonnes alignées d'une ligne à l'autre, noms longs tronqués sans pousser les colonnes.</li>
+<li>Contrastes lisibles en clair et en sombre ; étiquettes dans les 4 langues sans débordement.</li>
+<li>Défilement du volet complet, titre fixe en haut.</li></ul></div>
+</body></html>

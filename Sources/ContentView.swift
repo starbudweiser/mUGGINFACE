@@ -2,12 +2,12 @@
 import SwiftUI
 
 enum Pane: String, CaseIterable, Identifiable {
-    case reco, favorites, watch, downloads, agent, hardware, settings
+    case reco, favorites, watch, audit, downloads, agent, hardware, settings
     var id: String { rawValue }
     var symbol: String {
         switch self {
         case .reco: return "sparkles"; case .favorites: return "star"; case .watch: return "bell"; case .downloads: return "arrow.down.circle"
-        case .agent: return "bubble.left.and.text.bubble.right"; case .hardware: return "cpu"; case .settings: return "gearshape"
+        case .audit: return "chart.line.uptrend.xyaxis"; case .agent: return "bubble.left.and.text.bubble.right"; case .hardware: return "cpu"; case .settings: return "gearshape"
         }
     }
 }
@@ -93,6 +93,7 @@ struct ContentView: View {
             navItem(.reco, count: nil)
             navItem(.favorites, count: app.favorites.isEmpty ? nil : app.favorites.count, brand: false)
             navItem(.watch, count: app.unreadCount == 0 ? nil : app.unreadCount, brand: true)
+            navItem(.audit, count: nil)
             navItem(.downloads, count: dl.activeCount == 0 ? nil : dl.activeCount, brand: true)
             navItem(.agent, count: nil)
             navItem(.hardware, count: nil)
@@ -134,6 +135,7 @@ struct ContentView: View {
         case .reco: centered(900) { if let id = nav.detailID { DetailView(id: id) } else { RecoView() } }
         case .favorites: centered(820) { FavoritesView() }
         case .watch: centered(820) { WatchView() }
+        case .audit: centered(900) { AuditView() }
         case .downloads: centered(820) { DownloadsView() }
         case .agent: centered(1000) { AgentView() }
         case .hardware: HardwareView()

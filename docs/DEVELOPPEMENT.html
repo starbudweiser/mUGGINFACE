@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="fr"><head><meta charset="utf-8"><title>mUGGINFACE — Document de développement</title>
+<style>
+@page { size: A4; margin: 18mm 16mm }
+*{box-sizing:border-box} body{font:10.5pt/1.5 -apple-system,"SF Pro Text",Helvetica,Arial,sans-serif;color:#26231e;margin:0}
+h1{font-size:26pt;margin:0 0 4pt} h1 span{color:#d9622b} h2{font-size:15pt;margin:20pt 0 6pt;border-bottom:2px solid #d9622b;padding-bottom:3pt;break-after:avoid}
+h3{font-size:11.5pt;margin:12pt 0 3pt;break-after:avoid} p{margin:4pt 0} .sub{color:#7b756a;margin-bottom:14pt}
+code,pre{font-family:"SF Mono",Menlo,monospace;font-size:8.8pt} code{background:#f0ece4;padding:0 3pt;border-radius:3pt}
+pre{background:#1c1c1f;color:#f5f5f7;padding:8pt 10pt;border-radius:6pt;white-space:pre-wrap;break-inside:avoid}
+table{border-collapse:collapse;width:100%;margin:6pt 0;break-inside:avoid} th,td{border:1px solid #e3ddd2;padding:4pt 6pt;text-align:left;vertical-align:top;font-size:9.5pt} th{background:#f4f1ec}
+ul{margin:4pt 0 4pt 16pt;padding:0} li{margin:2pt 0} .note{background:#fdf3ea;border-left:3px solid #d9622b;padding:6pt 9pt;margin:8pt 0;break-inside:avoid}
+.cover{height:240mm;display:flex;flex-direction:column;justify-content:center;break-after:page} .cover .tag{color:#7b756a;font-size:12pt}
+</style></head><body>
+
+<div class="cover">
+<h1><span>m</span>UGGINFACE</h1>
+<div style="font-size:18pt;margin-bottom:10pt">Document de développement</div>
+<div class="tag">Version 1.0.12 + volet Audit · novembre 2026<br>DESKTOP MAC TOOLKIT · Starbudweiser &amp; Claude Code (Anthropic) · Licence MIT</div>
+<p style="margin-top:30pt;max-width:120mm">Architecture, modules, flux de données, algorithmes, construction, signature, publication et marche à suivre pour ajouter une fonction. Le détail fonctionnel est dans <code>docs/FONCTIONNALITES.md</code>, les maquettes dans <code>docs/mUGGINFACE-Maquettage.pdf</code>.</p>
+</div>
+
+<h2>1. Vue d'ensemble</h2>
+<p>Application macOS native, <b>Swift 5 / SwiftUI</b>, cible <code>arm64-apple-macos15</code>, sans dépendance externe ni gestionnaire de paquets : tous les fichiers de <code>Sources/</code> sont compilés d'un coup par <code>swiftc</code> (<code>build_app.sh</code>). Réseau : <code>URLSession</code> seul. Stockage : fichiers JSON dans Application Support, <code>UserDefaults</code> pour les préférences, Trousseau pour les jetons. Design : Flat Mat clair / sombre (<code>Theme.swift</code>). 4 langues, mêmes clés partout (<code>L10n.swift</code>, <code>L10nAudit.swift</code>).</p>
+
+<h2>2. Arborescence</h2>
+<table><tr><th>Fichier</th><th>Rôle</th></tr>
+<tr><td>App.swift</td><td>Point d'entrée, délégué d'application, icône de barre de menus (menu ouvert à la main sous l'icône, jamais <code>statusItem.menu</code>), fenêtre, ouverture des volets.</td></tr>
+<tr><td>AppModel.swift</td><td><code>Prefs</code> (préférences publiées), <code>AppModel</code> (catalogue, favoris, événements, scan, classement), enregistrement <code>catalog.json</code>, notifications.</td></tr>
+<tr><td>Models.swift</td><td><code>Domain</code>, <code>Model</code>, <code>Variant</code>, <code>FitResult</code>, <code>Scoring</code> (poids, adéquation, performance, score), <code>WatchEvent</code>, <code>HardwareInfo</code>.</td></tr>
+<tr><td>Hub.swift</td><td>Client de l'API Hugging Face : liste par domaine, fichiers et variantes, fiche d'un modèle (<code>Hub.info</code>), benchmarks publiés (<code>Hub.Eval</code>).</td></tr>
+<tr><td>Hardware.swift</td><td>Puce, mémoire (<code>sysctl</code>), disque libre, débit mémoire estimé par puce.</td></tr>
+<tr><td>Downloads.swift</td><td><code>DownloadManager</code> : file, pause / reprise (Range, <code>.part</code>), SHA-256, jeton jamais transmis hors du Hub.</td></tr>
+<tr><td>Agent.swift</td><td><code>AgentBridge</code> : discussion, invites d'installation et de test, cibles Claude Code / API / commande.</td></tr>
+<tr><td>AuditAgent.swift</td><td>Analyse rédigée par l'agent, plan de mise à jour, sauvegarde, exécution encadrée, retour arrière.</td></tr>
+<tr><td>Audit.swift</td><td>Nouveau : <code>InstalledScanner</code>, <code>AuditEntry</code>, <code>AuditSnapshot</code>, <code>AuditStore</code>.</td></tr>
+<tr><td>ContentView / RecoViews / OtherViews / SettingsView / AuditView / About</td><td>Vues SwiftUI : fenêtre, navigation (<code>Pane</code>, <code>Nav</code>), recommandations et fiche, favoris, veille, téléchargements, agent, matériel, réglages, audit.</td></tr>
+<tr><td>Theme.swift</td><td>Palette, <code>card()</code>, <code>MatButton</code>, <code>Tag</code>, <code>Chip</code>, <code>Bar</code>, <code>MatSwitch</code>, <code>Spinner</code>, <code>BrandName</code>.</td></tr>
+<tr><td>Updater.swift</td><td>Mise à jour automatique (releases GitHub, signature Developer ID, remplacement et relance).</td></tr>
+<tr><td>build_app.sh / release.sh</td><td>Compilation, signature, installation ; notarisation et publication.</td></tr></table>
+
+<h2>3. Modèle de données</h2>
+<pre>Model { id, domains[], downloads, likes, trending, lastModified, created, tags[], gated,
+        paramsB?, license?, weightsGB?, realGB?, format (mlx|gguf|safetensors), bits }
+Row   { model, fit: FitResult{level, ramGB?, tokensPerSec?}, score }
+catalog.json  { models{id→Model}, firstSeen, favorites, events[WatchEvent], lastScan, snapshot{domain→top10} }
+audit.json    { history[ AuditSnapshot{date, items[{id, domain, score, bestID, bestScore}],
+                         index, upToDate, better, unknown, totalGB} ] }
+downloads.json[ DownloadItem{id, modelID, label, files[RepoFile], destDir, state, doneBytes} ]</pre>
+
+<h2>4. Flux</h2>
+<pre>Lancement → Hardware.detect → lecture catalog.json (affichage immédiat) → startScheduler (minuterie 10 min)
+  scan() : pour chaque domaine → Hub.fetch (tendance + téléchargements, 40 chacun) → fusion dans models
+         → top 10 par domaine vs snapshot → WatchEvent (new / enter / rise / removed) → save() + notification
+         → refineWeights (taille réelle, 150 modèles max, 4 requêtes en parallèle)
+         → si Prefs.auditAuto : AuditStore.run(auto: true)</pre>
+
+<h2>5. Algorithmes</h2>
+<h3>5.1 Poids, RAM, adéquation (<code>Scoring</code>)</h3>
+<ul><li>Poids = paramètres × bits / 8 × 1,05 (paramètres : nom du dépôt, sinon safetensors / GGUF ; bits : nom et étiquettes, table des quantifications). Remplacé par <code>realGB</code> (somme réelle des fichiers de référence) après <code>refineWeights</code>.</li>
+<li>RAM = poids × 1,10 + 1,5 Go. Utilisable = mémoire totale − réserve (défaut 16 Go). Niveaux : ≤ 60 % Fluide, ≤ 85 % Compatible, ≤ 100 % Limite, sinon Trop lourd.</li>
+<li>Débit (LLM) = min(400, bande passante × 0,7 / poids).</li></ul>
+<h3>5.2 Performance et score</h3>
+<p>performance = 10 × (0,30 taille + 0,28 j'aime + 0,22 téléchargements + 0,10 tendance + 0,10 fraîcheur), chaque terme borné à [0, 1] (échelles logarithmiques pour taille, j'aime, téléchargements ; fraîcheur linéaire sur 365 jours). Score = 0,62 × performance + 0,38 × légèreté (1 − RAM / utilisable).</p>
+
+<h2>6. Module Audit</h2>
+<h3>6.1 Détection (<code>InstalledScanner.scan</code>, hors thread principal)</h3>
+<table><tr><th>Source</th><th>Chemin</th><th>Identifiant</th></tr>
+<tr><td>Cache Hugging Face</td><td><code>$HUGGINGFACE_HUB_CACHE</code>, <code>$HF_HOME/hub</code>, <code>~/.cache/huggingface/hub/models--A--B</code></td><td>A/B</td></tr>
+<tr><td>Application</td><td>Dossier des modèles (<code>Prefs.modelsPath</code>), un sous-dossier par modèle</td><td>modelID du téléchargement terminé, sinon nom du dossier</td></tr>
+<tr><td>LM Studio</td><td><code>~/.lmstudio/models</code>, <code>~/.cache/lm-studio/models</code> (éditeur/dépôt)</td><td>éditeur/dépôt</td></tr>
+<tr><td>Ollama</td><td><code>~/.ollama/models/manifests/…/espace/nom/étiquette</code> (somme des couches)</td><td>nom:étiquette</td></tr>
+<tr><td>Dossiers choisis</td><td><code>Prefs.auditDirs</code> (un sous-dossier = un modèle ; le dossier lui-même s'il contient des poids)</td><td>nom du dossier</td></tr></table>
+<div class="note">Piège rencontré : dans le cache Hub, les fichiers de <code>snapshots/</code> sont des liens vers un dossier <code>blobs/</code> partagé. Mesurer le dossier du modèle donne ≈ 0. <code>linkedSize</code> résout chaque lien et dédoublonne les chemins résolus.</div>
+<h3>6.2 Identification et domaine</h3>
+<ol><li><code>AuditStore.match</code> : identifiant exact, puis insensible à la casse, puis même <code>baseName</code> (suffixes de quantification retirés : 4bit, 8bit, bf16, fp16, mlx, gguf, q4…), en gardant le plus aimé.</li>
+<li>Si l'identifiant ressemble à un dépôt Hub : <code>Hub.info</code> (une requête avec <code>expand[]=pipeline_tag,evalResults,…</code>, mise en cache mémoire) donne domaine, métadonnées et benchmarks.</li>
+<li>Sinon <code>guessDomain</code> (mots du nom) ; sinon « Hors catalogue ».</li></ol>
+<h3>6.3 Candidat et verdict</h3>
+<ul><li>Candidats = <code>AppModel.rows(domains:[d], filtered:false)</code> filtrés : adéquation ≠ Trop lourd ; pas le même modèle ni la même famille (<code>baseName</code>) ; ni mots parasites (uncensored, abliterated, heretic, jailbreak, nsfw, unfiltered) ; ≥ 100 j'aime ; même tâche (étiquettes de pipeline, avec regroupements embeddings et vidéo) ; pas de sous-tâche voisine (diariz, segmentation, vad, pii, punctuation) absente du modèle installé.</li>
+<li>Meilleur = performance maximale. gain = perf(meilleur) / perf(installé) − 1. Verdict : ≥ 0,15 → <i>Mieux disponible</i>, sinon <i>À jour</i> ; <i>Hors catalogue</i> si aucune donnée.</li>
+<li>Benchmarks : <code>commonEval</code> = premier couple (dataset, tâche) présent dans les deux fiches ; valeurs affichées côte à côte sans jugement de sens (certaines métriques baissent en s'améliorant, ex. WER).</li></ul>
+<h3>6.4 Indice et instantanés</h3>
+<p>Indice = moyenne sur les modèles connus de min(1, perf / max(perf, perf du candidat)) × 100. Un instantané par jour (<code>Calendar.isDate(inSameDayAs:)</code> : le dernier remplace le précédent), 120 conservés. <code>changes</code> compare les identifiants du dernier et de l'avant-dernier instantané. Déclenchement : bouton, <code>.task</code> à l'ouverture si la liste est vide, fin de <code>scan()</code> si <code>auditAuto</code> et dernier audit &gt; 20 h.</p>
+<h3>6.5 Interface (<code>AuditView</code>)</h3>
+<ul><li>Trois cartes de résumé de même largeur et même hauteur (<code>HStack.fixedSize(vertical)</code> + <code>maxHeight: .infinity</code>), carte Évolution, une carte par domaine, carte Dossiers.</li>
+<li>Règle d'alignement : le cadre (<code>frame</code>) se pose <b>avant</b> <code>.card()</code> pour que le fond de la carte prenne toute la largeur ; colonnes de ligne à largeurs fixes (source 140, taille 64, score 104, verdict 120, nom flexible) pour que tout s'aligne d'une ligne à l'autre.</li></ul>
+
+<h3>6.6 Analyse et mise à jour assistées (<code>AuditAgent.swift</code>)</h3>
+<p><code>AuditAgentStore</code> (singleton principal) pilote l'agent via <code>AgentBridge.run</code>, étendu avec <code>extraRules</code> (règles d'autorisation Claude Code), <code>addDirs</code> (<code>--add-dir</code>) et <code>timeout</code> (garde-fou qui termine un agent bloqué).</p>
+<table><tr><th>Étape</th><th>Fonction</th><th>Détail</th></tr>
+<tr><td>Analyse</td><td><code>analyze()</code></td><td>Invite en anglais avec les données d'audit (aucune donnée personnelle) ; réponse dans la langue de l'application ; stockée dans <code>audit-agent.json</code>. Sans outils, délai 5 min.</td></tr>
+<tr><td>Plan</td><td><code>preparePlan()</code></td><td>Remplacements cochés + fichiers d'instructions + règles imposées au plan ; texte éditable (<code>draftPlan</code>). Sans outils.</td></tr>
+<tr><td>Sauvegarde</td><td><code>makeBackups(id)</code></td><td>Copie chaque fichier / dossier d'instructions et le journal <code>WORKFLOW-EVOLUTION.md</code> dans <code>plans/&lt;id&gt;/backup/&lt;n&gt;-nom</code> ; <code>backup = nil</code> si le fichier n'existait pas (sera retiré au retour).</td></tr>
+<tr><td>Exécution</td><td><code>execute()</code></td><td>Crée <code>journal.json</code> vide, enregistre le plan (statut Préparé), lance l'agent avec outils : règles <code>Edit(//chemin)</code> (et <code>/**</code> pour un dossier) pour les seuls fichiers autorisés, journal et dossier du plan en <code>--add-dir</code>, délai 45 min. Statut Exécuté ou Échec ; téléchargements lus dans le journal.</td></tr>
+<tr><td>Retour</td><td><code>rollback(id)</code></td><td>Restaure chaque sauvegarde (le fichier courant part dans <code>replaced/</code>), retire ce que le plan a créé, met à la corbeille (<code>trashItem</code>) les téléchargements du journal. Chemins validés : fichiers = liste d'instructions + journal ; modèles = dossier des modèles, cache Hub, dossiers analysés.</td></tr></table>
+<div class="note">Le journal écrit par l'agent est une donnée non fiable : l'application ne s'y fie que pour des chemins situés dans des racines autorisées, et jamais pour supprimer définitivement (corbeille seulement).</div>
+<div class="note">Pièges rencontrés : la règle <code>Write(...)</code> est refusée par Claude Code (<code>Edit</code> couvre toute écriture de fichier) ; les chemins absolus des règles s'écrivent avec <code>//</code> au début ; un agent sans délai maximal peut bloquer l'interface. Test de bout en bout réalisé (agent réel, dossiers temporaires, bundle d'essai séparé) : exécution, fichier modifié, journal créé, retour arrière complet.</div>
+
+<h2>7. Réseau</h2>
+<ul><li>Liste : <code>GET /api/models?pipeline_tag=…&amp;sort=trendingScore|downloads&amp;limit=40&amp;expand[]=downloads,likes,lastModified,createdAt,tags,gated,safetensors,trendingScore,gguf</code>.</li>
+<li>Fiche : <code>GET /api/models/{id}?expand[]=…,pipeline_tag,evalResults</code>. Fichiers : <code>/api/models/{id}/tree/main?recursive=true</code>.</li>
+<li>User-Agent générique « mUGGINFACE », jeton Trousseau en Bearer si présent. Aucune donnée personnelle.</li></ul>
+
+<h2>8. Internationalisation</h2>
+<p>Table par langue dans <code>L10n.swift</code>, fusionnée avec <code>auditFr / En / Es / It</code> (<code>L.tables</code>). <code>L.t(clé, arguments…)</code> retombe sur l'anglais puis sur la clé. Toute nouvelle chaîne s'ajoute dans les 4 langues, avec les mêmes clés.</p>
+
+<h2>9. Construction, signature, installation</h2>
+<pre>cd mUGGINFACE
+DEV=1 NO_OPEN=1 ./build_app.sh      # « mUGGINFACE dev.app » (fr.stephan.mugginface.dev, données séparées), signée, non installée
+./build_app.sh                      # version installée dans ~/Applications/Applications Personnelles (signature locale stable)
+open -g -j "mUGGINFACE dev.app"     # lancement sans prendre le focus</pre>
+<p>Le script compile <code>Sources/*.swift</code> (<code>-O -swift-version 5 -parse-as-library</code>), copie l'icône et les <code>InfoPlist.strings</code> des 4 langues, signe avec <code>/Volumes/SKYRIM/TOOLS/MAC/_tools/sign_app.sh</code>. Les données de la version dev sont séparées (dossier Application Support au nom de son identifiant).</p>
+
+<h2>10. Marche de développement et de publication</h2>
+<ol><li>Modifier, compiler en dev, tester (lancement en arrière-plan, captures par <code>screencapture -l &lt;id de fenêtre&gt;</code>).</li>
+<li>Mettre à jour la version locale installée avec <code>./build_app.sh</code> ; quitter (⌘Q) puis relancer l'appli pour voir la nouvelle version.</li>
+<li>Pas de notarisation, de push ni de release à chaque retouche. Sur demande « compile, notarise et pousse » : tests, <code>release.sh</code> (notarisation par <code>_tools/notarize_app.sh</code>, profil « Applications »), commit et push sur <code>main</code>.</li></ol>
+
+<h2>11. Ajouter une fonction : liste de contrôle</h2>
+<ul><li>Maquette dans le design de l'appli (voir le PDF de maquettage), validée avant le code.</li>
+<li>Textes dans les 4 langues, aucune chaîne visible en dur.</li>
+<li>Alignements vérifiés (cartes de même largeur, colonnes fixes) en clair et en sombre.</li>
+<li>Aucune donnée personnelle dans les requêtes ; un nom d'appli dans l'interface garde le « m » coloré, sauf dans un menu déroulant.</li>
+<li>Test en dev (arrière-plan), puis version locale installée, puis seulement à la demande notarisation et publication.</li></ul>
+
+<h2>12. Pistes</h2>
+<ul><li>Banc d'essai local par domaine (vitesse mesurée, qualité sur un jeu d'exemples) pour compléter l'indice estimé.</li>
+<li>Source de classements publics supplémentaires (MTEB, Open ASR, Artificial Analysis) si une API stable existe.</li>
+<li>Ranking moins sensible à la popularité (filtre des variantes bricolées dans toute l'appli, pas seulement dans l'audit).</li>
+<li>Export de l'historique d'audit (CSV) pour suivre l'atelier dans un tableur.</li></ul>
+</body></html>

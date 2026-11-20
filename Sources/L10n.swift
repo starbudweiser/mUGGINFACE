@@ -20,7 +20,9 @@ enum L {
 
     static func date(_ d: Date) -> String { d.formatted(Date.FormatStyle(date: .abbreviated, time: .shortened).locale(locale)) }
 
-    static let tables: [String: [String: String]] = ["fr": fr, "en": en, "es": es, "it": it]
+    static let tables: [String: [String: String]] = [
+        "fr": fr.merging(auditFr) { a, _ in a }, "en": en.merging(auditEn) { a, _ in a },
+        "es": es.merging(auditEs) { a, _ in a }, "it": it.merging(auditIt) { a, _ in a }]
 
     private static let fr: [String: String] = [
         "unit.mb": "%@ Mo",

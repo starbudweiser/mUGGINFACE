@@ -19,6 +19,15 @@ private struct APIModel: Decodable {
     var gated: GatedValue?
     var safetensors: ST?
     var gguf: GG?
+    var pipeline_tag: String?
+    var evalResults: [Eval]?
+    struct Eval: Decodable {
+        var data: D?
+        struct D: Decodable {
+            var dataset: DS?; var value: Double?
+            struct DS: Decodable { var id: String?; var task_id: String? }
+        }
+    }
     struct GG: Decodable { var total: Double? }
     struct ST: Decodable { var total: Double?; var parameters: [String: Double]? }
     enum GatedValue: Decodable {
@@ -76,6 +85,32 @@ enum Hub {
             }
         }
         return out
+    }
+
+    /// Résultat d'un benchmark public publié dans la fiche du modèle (classements Hub).
+    struct Eval: Codable, Hashable { var dataset: String; var task: String; var value: Double }
+
+    /// Fiche d'un modèle précis (modèle installé hors catalogue) : métadonnées, domaine déduit de l'étiquette de pipeline, benchmarks publiés.
+    static func info(id: String, token: String?) async -> (model: Model, domain: Domain?, evals: [Eval])? {
+        var c = URLComponents(string: "\(base)/api/models/\(id)")!
+        c.queryItems = ["downloads", "likes", "lastModified", "createdAt", "tags", "gated", "safetensors", "trendingScore", "gguf", "pipeline_tag", "evalResults"]
+            .map { URLQueryItem(name: "expand[]", value: $0) }
+        guard let url = c.url, let data = try? await get(url, token: token), let a = try? JSONDecoder().decode(APIModel.self, from: data) else { return nil }
+        let dom = domainOf(pipeline: a.pipeline_tag, name: a.id)
+        var m = make(a, domain: dom ?? .text)
+        if dom == nil { m.domains = [] }
+        let ev = (a.evalResults ?? []).compactMap { e -> Eval? in
+            guard let d = e.data, let v = d.value, let ds = d.dataset?.id else { return nil }
+            return Eval(dataset: ds, task: d.dataset?.task_id ?? "", value: v)
+        }
+        return (m, dom, ev)
+    }
+
+    static func domainOf(pipeline: String?, name: String) -> Domain? {
+        guard let p = pipeline else { return nil }
+        let n = name.lowercased()
+        if p == "text-generation" { return n.contains("coder") || n.contains("code") ? .code : .text }
+        return Domain.allCases.first { d in d != .code && d.queries.contains { $0.pipeline == p } }
     }
 
     private static func make(_ a: APIModel, domain: Domain) -> Model {

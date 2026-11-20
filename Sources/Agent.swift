@@ -97,18 +97,28 @@ final class AgentBridge: ObservableObject {
         }
     }
 
-    func run(prompt: String, allowTools: Bool) async throws -> String {
+    /// `extraRules` : règles d'autorisation Claude Code supplémentaires (ex. « Edit(//chemin) ») ; `addDirs` : dossiers supplémentaires accessibles.
+    func run(prompt: String, allowTools: Bool, extraRules: [String] = [], addDirs: [String] = [], timeout: Double = 600) async throws -> String {
         switch kind {
         case .claudeAPI: return try await callAPI(prompt)
         case .claudeCode:
-            let allowed = allowTools ? " --allowedTools 'Bash(hf:*)' 'Bash(huggingface-cli:*)' 'Bash(df:*)' 'Bash(ls:*)' 'Bash(du:*)' 'Bash(mkdir:*)' 'Bash(python3 -m mlx_lm:*)' 'Bash(mlx_lm.generate:*)' 'Bash(mlx_lm.benchmark:*)' 'Bash(llama-cli:*)' 'Bash(llama-bench:*)' 'Bash(llama-server:*)' 'Bash(calcul-lourd:*)' 'Bash(find:*)' 'Bash(stat:*)'" : ""
-            return try await shell("claude -p \"$MUG_PROMPT\"\(allowed)", prompt: prompt, cwd: allowTools ? prefs.modelsPath : NSHomeDirectory(), stdin: nil)
+            var allowed = ""
+            if allowTools {
+                let base = ["Bash(hf:*)", "Bash(huggingface-cli:*)", "Bash(df:*)", "Bash(ls:*)", "Bash(du:*)", "Bash(mkdir:*)", "Bash(python3 -m mlx_lm:*)", "Bash(mlx_lm.generate:*)",
+                            "Bash(mlx_lm.benchmark:*)", "Bash(llama-cli:*)", "Bash(llama-bench:*)", "Bash(llama-server:*)", "Bash(calcul-lourd:*)", "Bash(find:*)", "Bash(stat:*)"]
+                allowed = " --allowedTools " + (base + extraRules).map { Self.sq($0) }.joined(separator: " ")
+                if !addDirs.isEmpty { allowed += " --add-dir " + addDirs.map { Self.sq($0) }.joined(separator: " ") }
+            }
+            return try await shell("claude -p \"$MUG_PROMPT\"\(allowed)", prompt: prompt, cwd: allowTools ? prefs.modelsPath : NSHomeDirectory(), stdin: nil, timeout: timeout)
         case .custom:
             let cmd = prefs.customAgentCmd.trimmingCharacters(in: .whitespaces)
             guard !cmd.isEmpty else { throw AgentError.noCommand }
-            return try await shell(cmd, prompt: prompt, cwd: allowTools ? prefs.modelsPath : NSHomeDirectory(), stdin: prompt)
+            return try await shell(cmd, prompt: prompt, cwd: allowTools ? prefs.modelsPath : NSHomeDirectory(), stdin: prompt, timeout: timeout)
         }
     }
+
+    /// Protège une chaîne pour le shell (guillemets simples).
+    static func sq(_ s: String) -> String { "'" + s.replacingOccurrences(of: "'", with: "'\\''") + "'" }
 
     private func callAPI(_ prompt: String) async throws -> String {
         guard let key = apiKey, !key.isEmpty else { throw AgentError.noKey }
@@ -129,7 +139,7 @@ final class AgentBridge: ObservableObject {
         return parts.compactMap { $0["text"] as? String }.joined()
     }
 
-    private func shell(_ command: String, prompt: String, cwd: String, stdin: String?) async throws -> String {
+    private func shell(_ command: String, prompt: String, cwd: String, stdin: String?, timeout: Double = 600) async throws -> String {
         try? FileManager.default.createDirectory(atPath: cwd, withIntermediateDirectories: true)
         return try await withCheckedThrowingContinuation { cont in
             DispatchQueue.global().async {
@@ -150,6 +160,9 @@ final class AgentBridge: ObservableObject {
                 p.standardOutput = out; p.standardError = errHandle ?? out
                 if stdin != nil { p.standardInput = inp } else { p.standardInput = FileHandle.nullDevice }
                 do { try p.run() } catch { cont.resume(throwing: error); return }
+                let killer = DispatchWorkItem { if p.isRunning { p.terminate() } }   // garde-fou : un agent bloqué ne gèle pas l'application
+                DispatchQueue.global().asyncAfter(deadline: .now() + timeout, execute: killer)
+                defer { killer.cancel() }
                 if let s = stdin { inp.fileHandleForWriting.write(Data(s.utf8)); try? inp.fileHandleForWriting.close() }
                 let data = out.fileHandleForReading.readDataToEndOfFile()
                 p.waitUntilExit()

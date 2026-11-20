@@ -33,6 +33,9 @@ final class Prefs: ObservableObject {
     @Published var verifyHash: Bool { didSet { d.set(verifyHash, forKey: "verifyHash") } }
     @Published var offerAgentTest: Bool { didSet { d.set(offerAgentTest, forKey: "offerAgentTest") } }
     @Published var manualMemGB: Double { didSet { d.set(manualMemGB, forKey: "manualMemGB") } }
+    @Published var auditDirsRaw: String { didSet { d.set(auditDirsRaw, forKey: "auditDirs") } }
+    @Published var auditInstrRaw: String { didSet { d.set(auditInstrRaw, forKey: "auditInstr") } }
+    @Published var auditAuto: Bool { didSet { d.set(auditAuto, forKey: "auditAuto") } }
 
     init() {
         func b(_ k: String, _ def: Bool) -> Bool { UserDefaults.standard.object(forKey: k) as? Bool ?? def }
@@ -57,6 +60,17 @@ final class Prefs: ObservableObject {
         verifyHash = b("verifyHash", true)
         offerAgentTest = b("offerAgentTest", true)
         manualMemGB = n("manualMemGB", 0)
+        auditDirsRaw = d.string(forKey: "auditDirs") ?? ""
+        auditAuto = b("auditAuto", true)
+        auditInstrRaw = d.string(forKey: "auditInstr") ?? ""
+    }
+    var auditInstr: [String] {
+        get { auditInstrRaw.split(separator: "\n").map(String.init) }
+        set { auditInstrRaw = newValue.joined(separator: "\n") }
+    }
+    var auditDirs: [String] {
+        get { auditDirsRaw.split(separator: "\n").map(String.init) }
+        set { auditDirsRaw = newValue.joined(separator: "\n") }
     }
 
     var domains: Set<Domain> {
@@ -116,7 +130,7 @@ final class AppModel: ObservableObject {
 
     var token: String? { Keychain.get("hf-token") }
 
-    private static var dataDir: URL {
+    static var dataDir: URL {
         let base = FileManager.default.urls(for: .applicationSupportDirectory, in: .userDomainMask)[0]
         let dir = base.appendingPathComponent(Bundle.main.bundleIdentifier ?? "fr.stephan.mugginface")
         try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
@@ -264,6 +278,7 @@ final class AppModel: ObservableObject {
         save()
         if !newEvents.isEmpty, prefs.notify, !firstEver { notify(newEvents) }
         await refineWeights()
+        if prefs.auditAuto { await AuditStore.shared.run(auto: true) }
     }
 
     /// Remplace l'estimation (paramètres × bits) par le poids réel lu dans la liste des fichiers du dépôt, pour les modèles affichés d'abord.
