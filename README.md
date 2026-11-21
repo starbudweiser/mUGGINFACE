@@ -16,3 +16,9 @@ mUGGINFACE is a native macOS app (part of the DESKTOP MAC TOOLKIT) that lists th
 - Lancer `./build_app.sh` (installe dans `~/Applications/Applications Personnelles`) ; `DEV=1 ./build_app.sh` construit la version de développement (`fr.stephan.mugginface.dev`, données séparées).
 - Maquettes : `maquettes/`. Architecture : `ARCHITECTURE.md`. Documentation : `docs/FONCTIONNALITES.md`, `docs/mUGGINFACE-Developpement.pdf`, `docs/mUGGINFACE-Maquettage.pdf`.
 - Les scores sont des estimations (taille, popularité, tendance, fraîcheur), pas des benchmarks officiels.
+
+## Support / Soutenir
+
+This app is free. If it is useful to you, you can support the project (optional, no reward expected): [GitHub Sponsors](https://github.com/sponsors/starbudweiser).
+
+Cette appli est gratuite. Si elle vous est utile, vous pouvez soutenir le projet (facultatif, sans contrepartie) : [GitHub Sponsors](https://github.com/sponsors/starbudweiser).
